@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:freezed/builder.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'main.freezed.dart';
 
 void main() {
   runApp(RebalancingApp());
@@ -44,7 +46,8 @@ class RebalancingHomePage extends StatelessWidget {
                 double totalRatio = state.cashRatio +
                     state.stockRatio +
                     (state.isBondEvaluationEnabled ? state.bondRatio : 0);
-                return Text('총 비중: ${totalRatio.toStringAsFixed(0)}% (100% 필요)');
+                return Text(
+                    '총 비중: ${totalRatio.toStringAsFixed(0)}% (100% 필요)');
               },
             ),
             SizedBox(height: 20),
@@ -90,8 +93,7 @@ class InvestmentInfoCard extends StatelessWidget {
             ),
             SizedBox(height: 10),
             TextField(
-              onChanged: (value) =>
-                  bloc.add(TotalInvestmentChanged(value)),
+              onChanged: (value) => bloc.add(TotalInvestmentChanged(value)),
               decoration: InputDecoration(
                 labelText: '총 매수 원금 금액',
               ),
@@ -229,7 +231,8 @@ class RebalancingRatioCard extends StatelessWidget {
                 ),
                 if (state.isStockDetailOn) ...[
                   SizedBox(height: 10),
-                  Text('개별 주식 비중 (%) : ${state.individualStockRatio.toStringAsFixed(0)}'),
+                  Text(
+                      '개별 주식 비중 (%) : ${state.individualStockRatio.toStringAsFixed(0)}'),
                   Slider(
                     value: state.individualStockRatio,
                     min: 0,
@@ -240,7 +243,8 @@ class RebalancingRatioCard extends StatelessWidget {
                       bloc.add(IndividualStockRatioChanged(value));
                     },
                   ),
-                  Text('지수 주식 비중 (%) : ${state.indexStockRatio.toStringAsFixed(0)}'),
+                  Text(
+                      '지수 주식 비중 (%) : ${state.indexStockRatio.toStringAsFixed(0)}'),
                   Slider(
                     value: state.indexStockRatio,
                     min: 0,
@@ -267,7 +271,8 @@ class RebalancingRatioCard extends StatelessWidget {
                   ),
                   if (state.isBondDetailOn) ...[
                     SizedBox(height: 10),
-                    Text('개별 채권 비중 (%) : ${state.individualBondRatio.toStringAsFixed(0)}'),
+                    Text(
+                        '개별 채권 비중 (%) : ${state.individualBondRatio.toStringAsFixed(0)}'),
                     Slider(
                       value: state.individualBondRatio,
                       min: 0,
@@ -278,7 +283,8 @@ class RebalancingRatioCard extends StatelessWidget {
                         bloc.add(IndividualBondRatioChanged(value));
                       },
                     ),
-                    Text('지수 채권 비중 (%) : ${state.indexBondRatio.toStringAsFixed(0)}'),
+                    Text(
+                        '지수 채권 비중 (%) : ${state.indexBondRatio.toStringAsFixed(0)}'),
                     Slider(
                       value: state.indexBondRatio,
                       min: 0,
@@ -309,51 +315,61 @@ abstract class RebalancingEvent {}
 
 class TotalInvestmentChanged extends RebalancingEvent {
   final String totalInvestment;
+
   TotalInvestmentChanged(this.totalInvestment);
 }
 
 class CurrentStockValueChanged extends RebalancingEvent {
   final String currentStockValue;
+
   CurrentStockValueChanged(this.currentStockValue);
 }
 
 class CurrentBondValueChanged extends RebalancingEvent {
   final String currentBondValue;
+
   CurrentBondValueChanged(this.currentBondValue);
 }
 
 class CashRatioChanged extends RebalancingEvent {
   final double cashRatio;
+
   CashRatioChanged(this.cashRatio);
 }
 
 class StockRatioChanged extends RebalancingEvent {
   final double stockRatio;
+
   StockRatioChanged(this.stockRatio);
 }
 
 class BondRatioChanged extends RebalancingEvent {
   final double bondRatio;
+
   BondRatioChanged(this.bondRatio);
 }
 
 class IndividualStockRatioChanged extends RebalancingEvent {
   final double individualStockRatio;
+
   IndividualStockRatioChanged(this.individualStockRatio);
 }
 
 class IndexStockRatioChanged extends RebalancingEvent {
   final double indexStockRatio;
+
   IndexStockRatioChanged(this.indexStockRatio);
 }
 
 class IndividualBondRatioChanged extends RebalancingEvent {
   final double individualBondRatio;
+
   IndividualBondRatioChanged(this.individualBondRatio);
 }
 
 class IndexBondRatioChanged extends RebalancingEvent {
   final double indexBondRatio;
+
   IndexBondRatioChanged(this.indexBondRatio);
 }
 
@@ -363,69 +379,27 @@ class ToggleBondEvaluation extends RebalancingEvent {}
 
 class ToggleBondDetail extends RebalancingEvent {}
 
+const defaultValue = 0.0;
+const defaultBoolean = false;
+
 // 상태 정의
-class RebalancingState {
-  final String totalInvestment;
-  final String currentStockValue;
-  final String currentBondValue;
-  final double cashRatio;
-  final double stockRatio;
-  final double bondRatio;
-  final double individualStockRatio;
-  final double indexStockRatio;
-  final double individualBondRatio;
-  final double indexBondRatio;
-  final bool isStockDetailOn;
-  final bool isBondEvaluationEnabled;
-  final bool isBondDetailOn;
-
-  RebalancingState({
-    this.totalInvestment = '',
-    this.currentStockValue = '',
-    this.currentBondValue = '',
-    this.cashRatio = 0.0,
-    this.stockRatio = 0.0,
-    this.bondRatio = 0.0,
-    this.individualStockRatio = 0.0,
-    this.indexStockRatio = 0.0,
-    this.individualBondRatio = 0.0,
-    this.indexBondRatio = 0.0,
-    this.isStockDetailOn = false,
-    this.isBondEvaluationEnabled = false,
-    this.isBondDetailOn = false,
-  });
-
-  RebalancingState copyWith({
-    String? totalInvestment,
-    String? currentStockValue,
-    String? currentBondValue,
-    double? cashRatio,
-    double? stockRatio,
-    double? bondRatio,
-    double? individualStockRatio,
-    double? indexStockRatio,
-    double? individualBondRatio,
-    double? indexBondRatio,
-    bool? isStockDetailOn,
-    bool? isBondEvaluationEnabled,
-    bool? isBondDetailOn,
-  }) {
-    return RebalancingState(
-      totalInvestment: totalInvestment ?? this.totalInvestment,
-      currentStockValue: currentStockValue ?? this.currentStockValue,
-      currentBondValue: currentBondValue ?? this.currentBondValue,
-      cashRatio: cashRatio ?? this.cashRatio,
-      stockRatio: stockRatio ?? this.stockRatio,
-      bondRatio: bondRatio ?? this.bondRatio,
-      individualStockRatio: individualStockRatio ?? this.individualStockRatio,
-      indexStockRatio: indexStockRatio ?? this.indexStockRatio,
-      individualBondRatio: individualBondRatio ?? this.individualBondRatio,
-      indexBondRatio: indexBondRatio ?? this.indexBondRatio,
-      isStockDetailOn: isStockDetailOn ?? this.isStockDetailOn,
-      isBondEvaluationEnabled: isBondEvaluationEnabled ?? this.isBondEvaluationEnabled,
-      isBondDetailOn: isBondDetailOn ?? this.isBondDetailOn,
-    );
-  }
+@freezed
+class RebalancingState with _$RebalancingState {
+  factory RebalancingState({
+    @Default("0.0") String totalInvestment,
+    @Default("0.0") String currentStockValue,
+    @Default("0.0") String currentBondValue,
+    @Default(0.0) double cashRatio,
+    @Default(0.0) double stockRatio,
+    @Default(0.0) double bondRatio,
+    @Default(0.0) double individualStockRatio,
+    @Default(0.0) double indexStockRatio,
+    @Default(0.0) double individualBondRatio,
+    @Default(0.0) double indexBondRatio,
+    @Default(false) bool isStockDetailOn,
+    @Default(false) bool isBondEvaluationEnabled,
+    @Default(false) bool isBondDetailOn,
+  }) = _RebalancingState;
 }
 
 // Bloc 구현
@@ -473,4 +447,9 @@ class RebalancingBloc extends Bloc<RebalancingEvent, RebalancingState> {
       emit(state.copyWith(isBondDetailOn: !state.isBondDetailOn));
     });
   }
+}
+
+@freezed
+class MyClass with _$MyClass {
+  factory MyClass({String? a, int? b}) = _MyClass;
 }

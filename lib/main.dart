@@ -27,7 +27,7 @@ class RebalancingHomePage extends StatefulWidget {
 }
 
 class _RebalancingHomePageState extends State<RebalancingHomePage> {
-  // 투자 정보 입력 컨트롤러
+  // 투자 정보 컨트롤러
   final TextEditingController totalInvestmentController = TextEditingController();
   final TextEditingController currentStockValueController = TextEditingController();
   final TextEditingController currentBondValueController = TextEditingController();
@@ -37,7 +37,7 @@ class _RebalancingHomePageState extends State<RebalancingHomePage> {
   double stockRatio = 0.0;
   double bondRatio = 0.0;
 
-  // 세부 설정 온/오프 변수
+  // 세부 설정 상태 변수
   bool isStockDetailOn = false;
   bool isBondEvaluationEnabled = false;
   bool isBondDetailOn = false;
@@ -63,249 +63,344 @@ class _RebalancingHomePageState extends State<RebalancingHomePage> {
         padding: EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // 투자 정보 입력 카드
-            Card(
-              elevation: 4,
-              margin: EdgeInsets.symmetric(vertical: 8),
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '투자 정보 입력',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    TextField(
-                      controller: totalInvestmentController,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: '총 매수 원금 금액',
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    // 현재 주식 평가 금액와 세부 설정 스위치
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: currentStockValueController,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              labelText: '현재 주식 평가 금액',
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        Column(
-                          children: [
-                            Text('세부 설정'),
-                            Switch(
-                              value: isStockDetailOn,
-                              onChanged: (value) {
-                                setState(() {
-                                  isStockDetailOn = value;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10),
-                    // 현재 채권 평가 금액, 채권 사용 및 세부 설정 스위치
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: currentBondValueController,
-                            enabled: isBondEvaluationEnabled,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              labelText: '현재 채권 평가 금액',
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        Column(
-                          children: [
-                            Text('채권 사용'),
-                            Switch(
-                              value: isBondEvaluationEnabled,
-                              onChanged: (value) {
-                                setState(() {
-                                  isBondEvaluationEnabled = value;
-                                  if (!value) {
-                                    isBondDetailOn = false;
-                                  }
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                        SizedBox(width: 10),
-                        if (isBondEvaluationEnabled)
-                          Column(
-                            children: [
-                              Text('세부 설정'),
-                              Switch(
-                                value: isBondDetailOn,
-                                onChanged: (value) {
-                                  setState(() {
-                                    isBondDetailOn = value;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+            InvestmentInfoCard(
+              totalInvestmentController: totalInvestmentController,
+              currentStockValueController: currentStockValueController,
+              currentBondValueController: currentBondValueController,
+              isStockDetailOn: isStockDetailOn,
+              isBondEvaluationEnabled: isBondEvaluationEnabled,
+              isBondDetailOn: isBondDetailOn,
+              onStockDetailChanged: (value) {
+                setState(() {
+                  isStockDetailOn = value;
+                });
+              },
+              onBondEvaluationChanged: (value) {
+                setState(() {
+                  isBondEvaluationEnabled = value;
+                  if (!value) {
+                    isBondDetailOn = false;
+                  }
+                });
+              },
+              onBondDetailChanged: (value) {
+                setState(() {
+                  isBondDetailOn = value;
+                });
+              },
             ),
             SizedBox(height: 20),
-            // 리벨런싱 비중 입력 카드
-            Card(
-              elevation: 4,
-              margin: EdgeInsets.symmetric(vertical: 8),
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '리벨런싱 비중 입력',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    // 현금 비중 슬라이더
-                    Text('현금 비중 (%) : ${cashRatio.toStringAsFixed(0)}'),
-                    Slider(
-                      value: cashRatio,
-                      min: 0,
-                      max: 100,
-                      divisions: 100,
-                      label: cashRatio.toStringAsFixed(0),
-                      onChanged: (value) {
-                        setState(() {
-                          cashRatio = value;
-                        });
-                      },
-                    ),
-                    SizedBox(height: 10),
-                    // 주식 비중 슬라이더
-                    Text('주식 비중 (%) : ${stockRatio.toStringAsFixed(0)}'),
-                    Slider(
-                      value: stockRatio,
-                      min: 0,
-                      max: 100,
-                      divisions: 100,
-                      label: stockRatio.toStringAsFixed(0),
-                      onChanged: (value) {
-                        setState(() {
-                          stockRatio = value;
-                        });
-                      },
-                    ),
-                    // 주식 세부 항목 (세부 설정 활성화 시)
-                    if (isStockDetailOn) ...[
-                      SizedBox(height: 10),
-                      Text('개별 주식 비중 (%) : ${individualStockRatio.toStringAsFixed(0)}'),
-                      Slider(
-                        value: individualStockRatio,
-                        min: 0,
-                        max: 100,
-                        divisions: 100,
-                        label: individualStockRatio.toStringAsFixed(0),
-                        onChanged: (value) {
-                          setState(() {
-                            individualStockRatio = value;
-                          });
-                        },
-                      ),
-                      Text('지수 주식 비중 (%) : ${indexStockRatio.toStringAsFixed(0)}'),
-                      Slider(
-                        value: indexStockRatio,
-                        min: 0,
-                        max: 100,
-                        divisions: 100,
-                        label: indexStockRatio.toStringAsFixed(0),
-                        onChanged: (value) {
-                          setState(() {
-                            indexStockRatio = value;
-                          });
-                        },
-                      ),
-                    ],
-                    SizedBox(height: 10),
-                    // 채권 비중 슬라이더 (채권 사용 활성화 시)
-                    if (isBondEvaluationEnabled) ...[
-                      Text('채권 비중 (%) : ${bondRatio.toStringAsFixed(0)}'),
-                      Slider(
-                        value: bondRatio,
-                        min: 0,
-                        max: 100,
-                        divisions: 100,
-                        label: bondRatio.toStringAsFixed(0),
-                        onChanged: (value) {
-                          setState(() {
-                            bondRatio = value;
-                          });
-                        },
-                      ),
-                      if (isBondDetailOn) ...[
-                        SizedBox(height: 10),
-                        Text('개별 채권 비중 (%) : ${individualBondRatio.toStringAsFixed(0)}'),
-                        Slider(
-                          value: individualBondRatio,
-                          min: 0,
-                          max: 100,
-                          divisions: 100,
-                          label: individualBondRatio.toStringAsFixed(0),
-                          onChanged: (value) {
-                            setState(() {
-                              individualBondRatio = value;
-                            });
-                          },
-                        ),
-                        Text('지수 채권 비중 (%) : ${indexBondRatio.toStringAsFixed(0)}'),
-                        Slider(
-                          value: indexBondRatio,
-                          min: 0,
-                          max: 100,
-                          divisions: 100,
-                          label: indexBondRatio.toStringAsFixed(0),
-                          onChanged: (value) {
-                            setState(() {
-                              indexBondRatio = value;
-                            });
-                          },
-                        ),
-                      ],
-                    ],
-                    SizedBox(height: 10),
-                    Text('총 비중: ${totalRatio.toStringAsFixed(0)}% (100% 필요)'),
-                  ],
-                ),
-              ),
+            RebalancingRatioCard(
+              cashRatio: cashRatio,
+              stockRatio: stockRatio,
+              bondRatio: bondRatio,
+              individualStockRatio: individualStockRatio,
+              indexStockRatio: indexStockRatio,
+              individualBondRatio: individualBondRatio,
+              indexBondRatio: indexBondRatio,
+              isStockDetailOn: isStockDetailOn,
+              isBondEvaluationEnabled: isBondEvaluationEnabled,
+              isBondDetailOn: isBondDetailOn,
+              onCashRatioChanged: (value) {
+                setState(() {
+                  cashRatio = value;
+                });
+              },
+              onStockRatioChanged: (value) {
+                setState(() {
+                  stockRatio = value;
+                });
+              },
+              onBondRatioChanged: (value) {
+                setState(() {
+                  bondRatio = value;
+                });
+              },
+              onIndividualStockRatioChanged: (value) {
+                setState(() {
+                  individualStockRatio = value;
+                });
+              },
+              onIndexStockRatioChanged: (value) {
+                setState(() {
+                  indexStockRatio = value;
+                });
+              },
+              onIndividualBondRatioChanged: (value) {
+                setState(() {
+                  individualBondRatio = value;
+                });
+              },
+              onIndexBondRatioChanged: (value) {
+                setState(() {
+                  indexBondRatio = value;
+                });
+              },
             ),
             SizedBox(height: 20),
-            // 계산 버튼
+            Text('총 비중: ${totalRatio.toStringAsFixed(0)}% (100% 필요)'),
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 if (totalRatio != 100) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('총 비중이 100%가 되어야 합니다.'))
+                    SnackBar(content: Text('총 비중이 100%가 되어야 합니다.')),
                   );
                 } else {
-                  // 리벨런싱 계산 로직 구현
                   print("리벨런싱 계산 진행...");
+                  // 리벨런싱 계산 로직 추가
                 }
               },
               child: Text('리벨런싱 계산'),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class InvestmentInfoCard extends StatelessWidget {
+  final TextEditingController totalInvestmentController;
+  final TextEditingController currentStockValueController;
+  final TextEditingController currentBondValueController;
+  final bool isStockDetailOn;
+  final bool isBondEvaluationEnabled;
+  final bool isBondDetailOn;
+  final ValueChanged<bool> onStockDetailChanged;
+  final ValueChanged<bool> onBondEvaluationChanged;
+  final ValueChanged<bool> onBondDetailChanged;
+
+  const InvestmentInfoCard({
+    Key? key,
+    required this.totalInvestmentController,
+    required this.currentStockValueController,
+    required this.currentBondValueController,
+    required this.isStockDetailOn,
+    required this.isBondEvaluationEnabled,
+    required this.isBondDetailOn,
+    required this.onStockDetailChanged,
+    required this.onBondEvaluationChanged,
+    required this.onBondDetailChanged,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      margin: EdgeInsets.symmetric(vertical: 8),
+      child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '투자 정보 입력',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: totalInvestmentController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: '총 매수 원금 금액',
+              ),
+            ),
+            SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: currentStockValueController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: '현재 주식 평가 금액',
+                    ),
+                  ),
+                ),
+                SizedBox(width: 10),
+                Column(
+                  children: [
+                    Text('세부 설정'),
+                    Switch(
+                      value: isStockDetailOn,
+                      onChanged: onStockDetailChanged,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: currentBondValueController,
+                    enabled: isBondEvaluationEnabled,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: '현재 채권 평가 금액',
+                    ),
+                  ),
+                ),
+                SizedBox(width: 10),
+                Column(
+                  children: [
+                    Text('채권 사용'),
+                    Switch(
+                      value: isBondEvaluationEnabled,
+                      onChanged: onBondEvaluationChanged,
+                    ),
+                  ],
+                ),
+                SizedBox(width: 10),
+                if (isBondEvaluationEnabled)
+                  Column(
+                    children: [
+                      Text('세부 설정'),
+                      Switch(
+                        value: isBondDetailOn,
+                        onChanged: onBondDetailChanged,
+                      ),
+                    ],
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class RebalancingRatioCard extends StatelessWidget {
+  final double cashRatio;
+  final double stockRatio;
+  final double bondRatio;
+  final double individualStockRatio;
+  final double indexStockRatio;
+  final double individualBondRatio;
+  final double indexBondRatio;
+  final bool isStockDetailOn;
+  final bool isBondEvaluationEnabled;
+  final bool isBondDetailOn;
+  final ValueChanged<double> onCashRatioChanged;
+  final ValueChanged<double> onStockRatioChanged;
+  final ValueChanged<double> onBondRatioChanged;
+  final ValueChanged<double> onIndividualStockRatioChanged;
+  final ValueChanged<double> onIndexStockRatioChanged;
+  final ValueChanged<double> onIndividualBondRatioChanged;
+  final ValueChanged<double> onIndexBondRatioChanged;
+
+  const RebalancingRatioCard({
+    Key? key,
+    required this.cashRatio,
+    required this.stockRatio,
+    required this.bondRatio,
+    required this.individualStockRatio,
+    required this.indexStockRatio,
+    required this.individualBondRatio,
+    required this.indexBondRatio,
+    required this.isStockDetailOn,
+    required this.isBondEvaluationEnabled,
+    required this.isBondDetailOn,
+    required this.onCashRatioChanged,
+    required this.onStockRatioChanged,
+    required this.onBondRatioChanged,
+    required this.onIndividualStockRatioChanged,
+    required this.onIndexStockRatioChanged,
+    required this.onIndividualBondRatioChanged,
+    required this.onIndexBondRatioChanged,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      margin: EdgeInsets.symmetric(vertical: 8),
+      child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '리벨런싱 비중 입력',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            Text('현금 비중 (%) : ${cashRatio.toStringAsFixed(0)}'),
+            Slider(
+              value: cashRatio,
+              min: 0,
+              max: 100,
+              divisions: 100,
+              label: cashRatio.toStringAsFixed(0),
+              onChanged: onCashRatioChanged,
+            ),
+            SizedBox(height: 10),
+            Text('주식 비중 (%) : ${stockRatio.toStringAsFixed(0)}'),
+            Slider(
+              value: stockRatio,
+              min: 0,
+              max: 100,
+              divisions: 100,
+              label: stockRatio.toStringAsFixed(0),
+              onChanged: onStockRatioChanged,
+            ),
+            if (isStockDetailOn) ...[
+              SizedBox(height: 10),
+              Text('개별 주식 비중 (%) : ${individualStockRatio.toStringAsFixed(0)}'),
+              Slider(
+                value: individualStockRatio,
+                min: 0,
+                max: 100,
+                divisions: 100,
+                label: individualStockRatio.toStringAsFixed(0),
+                onChanged: onIndividualStockRatioChanged,
+              ),
+              Text('지수 주식 비중 (%) : ${indexStockRatio.toStringAsFixed(0)}'),
+              Slider(
+                value: indexStockRatio,
+                min: 0,
+                max: 100,
+                divisions: 100,
+                label: indexStockRatio.toStringAsFixed(0),
+                onChanged: onIndexStockRatioChanged,
+              ),
+            ],
+            SizedBox(height: 10),
+            if (isBondEvaluationEnabled) ...[
+              Text('채권 비중 (%) : ${bondRatio.toStringAsFixed(0)}'),
+              Slider(
+                value: bondRatio,
+                min: 0,
+                max: 100,
+                divisions: 100,
+                label: bondRatio.toStringAsFixed(0),
+                onChanged: onBondRatioChanged,
+              ),
+              if (isBondDetailOn) ...[
+                SizedBox(height: 10),
+                Text('개별 채권 비중 (%) : ${individualBondRatio.toStringAsFixed(0)}'),
+                Slider(
+                  value: individualBondRatio,
+                  min: 0,
+                  max: 100,
+                  divisions: 100,
+                  label: individualBondRatio.toStringAsFixed(0),
+                  onChanged: onIndividualBondRatioChanged,
+                ),
+                Text('지수 채권 비중 (%) : ${indexBondRatio.toStringAsFixed(0)}'),
+                Slider(
+                  value: indexBondRatio,
+                  min: 0,
+                  max: 100,
+                  divisions: 100,
+                  label: indexBondRatio.toStringAsFixed(0),
+                  onChanged: onIndexBondRatioChanged,
+                ),
+              ],
+            ],
           ],
         ),
       ),

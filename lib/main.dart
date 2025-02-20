@@ -17,8 +17,6 @@ class RebalancingApp extends StatelessWidget {
         brightness: Brightness.dark,
       ),
       home: RebalancingHomePage(),
-
-
     );
   }
 }
@@ -29,26 +27,31 @@ class RebalancingHomePage extends StatefulWidget {
 }
 
 class _RebalancingHomePageState extends State<RebalancingHomePage> {
-  // 투자 관련 입력 컨트롤러
+  // 투자 정보 입력 컨트롤러
   final TextEditingController totalInvestmentController = TextEditingController();
   final TextEditingController currentStockValueController = TextEditingController();
+  final TextEditingController currentBondValueController = TextEditingController();
 
-  // 리벨런싱 비중 변수 (0~100)
+  // 리벨런싱 비중 변수
   double cashRatio = 0.0;
   double stockRatio = 0.0;
   double bondRatio = 0.0;
 
-  // 주식 세부 항목 on/off 여부
+  // 세부 설정 온/오프 변수
   bool isStockDetailOn = false;
-  // 채권 사용 on/off (기본 off)
-  bool isBondOn = false;
+  bool isBondEvaluationEnabled = false;
+  bool isBondDetailOn = false;
 
   // 주식 세부 비중
   double individualStockRatio = 0.0;
   double indexStockRatio = 0.0;
 
-  // 총 비중 계산 (실시간 업데이트)
-  double get totalRatio => cashRatio + stockRatio + bondRatio;
+  // 채권 세부 비중
+  double individualBondRatio = 0.0;
+  double indexBondRatio = 0.0;
+
+  // 총 비중 계산 (채권 사용 여부에 따라)
+  double get totalRatio => cashRatio + stockRatio + (isBondEvaluationEnabled ? bondRatio : 0);
 
   @override
   Widget build(BuildContext context) {
@@ -82,12 +85,81 @@ class _RebalancingHomePageState extends State<RebalancingHomePage> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    TextField(
-                      controller: currentStockValueController,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: '현재 주식 평가 금액',
-                      ),
+                    // 현재 주식 평가 금액와 세부 설정 스위치
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: currentStockValueController,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              labelText: '현재 주식 평가 금액',
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Column(
+                          children: [
+                            Text('세부 설정'),
+                            Switch(
+                              value: isStockDetailOn,
+                              onChanged: (value) {
+                                setState(() {
+                                  isStockDetailOn = value;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    // 현재 채권 평가 금액, 채권 사용 및 세부 설정 스위치
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: currentBondValueController,
+                            enabled: isBondEvaluationEnabled,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              labelText: '현재 채권 평가 금액',
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Column(
+                          children: [
+                            Text('채권 사용'),
+                            Switch(
+                              value: isBondEvaluationEnabled,
+                              onChanged: (value) {
+                                setState(() {
+                                  isBondEvaluationEnabled = value;
+                                  if (!value) {
+                                    isBondDetailOn = false;
+                                  }
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                        SizedBox(width: 10),
+                        if (isBondEvaluationEnabled)
+                          Column(
+                            children: [
+                              Text('세부 설정'),
+                              Switch(
+                                value: isBondDetailOn,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isBondDetailOn = value;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                      ],
                     ),
                   ],
                 ),
@@ -123,26 +195,8 @@ class _RebalancingHomePageState extends State<RebalancingHomePage> {
                       },
                     ),
                     SizedBox(height: 10),
-                    // 주식 비중 슬라이더 및 상세 옵션 스위치
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('주식 비중 (%) : ${stockRatio.toStringAsFixed(0)}'),
-                        Row(
-                          children: [
-                            Text('세부 설정'),
-                            Switch(
-                              value: isStockDetailOn,
-                              onChanged: (value) {
-                                setState(() {
-                                  isStockDetailOn = value;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                    // 주식 비중 슬라이더
+                    Text('주식 비중 (%) : ${stockRatio.toStringAsFixed(0)}'),
                     Slider(
                       value: stockRatio,
                       min: 0,
@@ -155,7 +209,7 @@ class _RebalancingHomePageState extends State<RebalancingHomePage> {
                         });
                       },
                     ),
-                    // 주식 세부 항목 (세부 설정이 켜진 경우)
+                    // 주식 세부 항목 (세부 설정 활성화 시)
                     if (isStockDetailOn) ...[
                       SizedBox(height: 10),
                       Text('개별 주식 비중 (%) : ${individualStockRatio.toStringAsFixed(0)}'),
@@ -186,31 +240,9 @@ class _RebalancingHomePageState extends State<RebalancingHomePage> {
                       ),
                     ],
                     SizedBox(height: 10),
-                    // 채권 비중 슬라이더 및 스위치
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('채권 비중 (%) : ${bondRatio.toStringAsFixed(0)}'),
-                        Row(
-                          children: [
-                            Text('채권 사용'),
-                            Switch(
-                              value: isBondOn,
-                              onChanged: (value) {
-                                setState(() {
-                                  isBondOn = value;
-                                  if (!isBondOn) {
-                                    bondRatio = 0;
-                                  }
-                                  // 채권 사용 시 자동 조정 로직 추가 가능
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    if (isBondOn)
+                    // 채권 비중 슬라이더 (채권 사용 활성화 시)
+                    if (isBondEvaluationEnabled) ...[
+                      Text('채권 비중 (%) : ${bondRatio.toStringAsFixed(0)}'),
                       Slider(
                         value: bondRatio,
                         min: 0,
@@ -223,15 +255,44 @@ class _RebalancingHomePageState extends State<RebalancingHomePage> {
                           });
                         },
                       ),
+                      if (isBondDetailOn) ...[
+                        SizedBox(height: 10),
+                        Text('개별 채권 비중 (%) : ${individualBondRatio.toStringAsFixed(0)}'),
+                        Slider(
+                          value: individualBondRatio,
+                          min: 0,
+                          max: 100,
+                          divisions: 100,
+                          label: individualBondRatio.toStringAsFixed(0),
+                          onChanged: (value) {
+                            setState(() {
+                              individualBondRatio = value;
+                            });
+                          },
+                        ),
+                        Text('지수 채권 비중 (%) : ${indexBondRatio.toStringAsFixed(0)}'),
+                        Slider(
+                          value: indexBondRatio,
+                          min: 0,
+                          max: 100,
+                          divisions: 100,
+                          label: indexBondRatio.toStringAsFixed(0),
+                          onChanged: (value) {
+                            setState(() {
+                              indexBondRatio = value;
+                            });
+                          },
+                        ),
+                      ],
+                    ],
                     SizedBox(height: 10),
-                    // 총 비중 확인
                     Text('총 비중: ${totalRatio.toStringAsFixed(0)}% (100% 필요)'),
                   ],
                 ),
               ),
             ),
             SizedBox(height: 20),
-            // 계산 버튼 (비중 검증 및 리벨런싱 로직 실행)
+            // 계산 버튼
             ElevatedButton(
               onPressed: () {
                 if (totalRatio != 100) {
@@ -239,7 +300,7 @@ class _RebalancingHomePageState extends State<RebalancingHomePage> {
                       SnackBar(content: Text('총 비중이 100%가 되어야 합니다.'))
                   );
                 } else {
-                  // 리벨런싱 계산 로직 구현 부분
+                  // 리벨런싱 계산 로직 구현
                   print("리벨런싱 계산 진행...");
                 }
               },

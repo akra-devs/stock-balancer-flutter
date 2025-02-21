@@ -54,17 +54,51 @@ class RebalancingHomePage extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 final state = context.read<RebalancingBloc>().state;
-                double totalRatio = state.cashRatio +
-                    state.stockRatio +
-                    (state.isBondEvaluationEnabled ? state.bondRatio : 0);
-                if (totalRatio != 100) {
+                // 입력값을 double로 변환 (실패 시 0.0)
+                double totalInvestment = double.tryParse(state.totalInvestment) ?? 0.0;
+                double currentStockValue = double.tryParse(state.currentStockValue) ?? 0.0;
+                double cashRatio = state.cashRatio;
+
+                if (totalInvestment == 0) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('총 비중이 100%가 되어야 합니다.')),
+                      SnackBar(content: Text('총 매수 원금이 0입니다.'))
                   );
-                } else {
-                  // 리벨런싱 계산 로직 추가
-                  print("리벨런싱 계산 진행...");
+                  return;
                 }
+                if (cashRatio >= 100) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('현금비중이 100% 이상일 수 없습니다.'))
+                  );
+                  return;
+                }
+
+                // 매수 당시 유추현금 계산: 총 매수원금 * (현금비중 / (100 - 현금비중))
+                double impliedCash = totalInvestment * (cashRatio / (100 - cashRatio));
+
+                // 목표 현금: (현금비중/100) * (impliedCash + 현재 주식 평가 금액)
+                double targetCash = (cashRatio / 100) * (impliedCash + currentStockValue);
+
+                // 리벨런싱 금액: 목표 현금 - 매수 당시 유추현금
+                // 양수이면 주식을 매도해서 현금을 늘려야 하고, 음수이면 주식을 매수하여 현금을 줄여야 함.
+                double rebalanceAmount = targetCash - impliedCash;
+                String action = rebalanceAmount > 0 ? '매도' : '매수';
+                double amount = rebalanceAmount.abs();
+
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text('리벨런싱 결과'),
+                    content: Text('주식을 ${amount.toStringAsFixed(2)} 만큼 $action 하세요.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text('확인'),
+                      ),
+                    ],
+                  ),
+                );
               },
               child: Text('리벨런싱 계산'),
             ),
@@ -162,22 +196,6 @@ class InvestmentInfoCard extends StatelessWidget {
                   },
                 ),
                 SizedBox(width: 10),
-                BlocBuilder<RebalancingBloc, RebalancingState>(
-                  builder: (context, state) {
-                    if (!state.isBondEvaluationEnabled) return SizedBox();
-                    return Column(
-                      children: [
-                        Text('세부 설정'),
-                        Switch(
-                          value: state.isBondDetailOn,
-                          onChanged: (_) {
-                            bloc.add(ToggleBondDetail());
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                ),
               ],
             ),
           ],
@@ -377,11 +395,6 @@ class ToggleStockDetail extends RebalancingEvent {}
 
 class ToggleBondEvaluation extends RebalancingEvent {}
 
-class ToggleBondDetail extends RebalancingEvent {}
-
-const defaultValue = 0.0;
-const defaultBoolean = false;
-
 // 상태 정의
 @freezed
 class RebalancingState with _$RebalancingState {
@@ -398,11 +411,13 @@ class RebalancingState with _$RebalancingState {
     @Default(0.0) double indexBondRatio,
     @Default(false) bool isStockDetailOn,
     @Default(false) bool isBondEvaluationEnabled,
-    @Default(false) bool isBondDetailOn,
   }) = _RebalancingState;
 }
 
-// Bloc 구현
+// ──────────────────────────────
+// Bloc 관련 코드 (수정된 이벤트 핸들러)
+// ──────────────────────────────
+
 class RebalancingBloc extends Bloc<RebalancingEvent, RebalancingState> {
   RebalancingBloc() : super(RebalancingState()) {
     on<TotalInvestmentChanged>((event, emit) {
@@ -414,37 +429,102 @@ class RebalancingBloc extends Bloc<RebalancingEvent, RebalancingState> {
     on<CurrentBondValueChanged>((event, emit) {
       emit(state.copyWith(currentBondValue: event.currentBondValue));
     });
+
+    // 두 슬라이더 모드: 채권 사용이 off인 경우 (세부설정이 off일 때)
+    // 세 개 모드: 채권 사용이 on인 경우 (세 개의 슬라이더: 현금, 주식, 채권)
     on<CashRatioChanged>((event, emit) {
-      emit(state.copyWith(cashRatio: event.cashRatio));
+      double newCash;
+      if (state.isBondEvaluationEnabled) {
+        // 채권 사용이 on인 경우: cash + stock + bond = 100
+        // cash의 최대값은 100 - state.stockRatio (그 후 bond가 채워짐)
+        double maxCash = 100 - state.stockRatio;
+        newCash = event.cashRatio.clamp(0, maxCash);
+        double newBond = 100 - (newCash + state.stockRatio);
+        emit(state.copyWith(cashRatio: newCash, bondRatio: newBond));
+      } else {
+        // 채권 사용 off: cash + stock = 100
+        double maxCash = 100;
+        newCash = event.cashRatio.clamp(0, maxCash);
+        double newStock = 100 - newCash;
+        emit(state.copyWith(cashRatio: newCash, stockRatio: newStock));
+      }
     });
+
     on<StockRatioChanged>((event, emit) {
-      emit(state.copyWith(stockRatio: event.stockRatio));
+      double newStock;
+      if (state.isBondEvaluationEnabled) {
+        // 채권 사용 on인 경우: cash + stock + bond = 100
+        // stock의 최대값은 100 - state.cashRatio
+        double maxStock = 100 - state.cashRatio;
+        newStock = event.stockRatio.clamp(0, maxStock);
+        double newBond = 100 - (state.cashRatio + newStock);
+        emit(state.copyWith(stockRatio: newStock, bondRatio: newBond));
+      } else {
+        // 채권 사용 off: cash + stock = 100
+        double maxStock = 100;
+        newStock = event.stockRatio.clamp(0, maxStock);
+        double newCash = 100 - newStock;
+        emit(state.copyWith(stockRatio: newStock, cashRatio: newCash));
+      }
     });
+
     on<BondRatioChanged>((event, emit) {
-      emit(state.copyWith(bondRatio: event.bondRatio));
+      if (state.isBondEvaluationEnabled) {
+        // 채권 사용 on인 경우: cash + stock + bond = 100
+        // bond의 최대값은 100 - (cash + stock)
+        double maxBond = 100 - (state.cashRatio + state.stockRatio);
+        double newBond = event.bondRatio.clamp(0, maxBond);
+        double newStock = 100 - (state.cashRatio + newBond);
+        emit(state.copyWith(bondRatio: newBond, stockRatio: newStock));
+      }
     });
+
+    // 주식 세부 설정 모드: 개별 주식과 지수 주식의 합이 100이 되어야 함.
     on<IndividualStockRatioChanged>((event, emit) {
-      emit(state.copyWith(individualStockRatio: event.individualStockRatio));
+      double newInd = event.individualStockRatio;
+      double newIndex = 100 - newInd;
+      emit(state.copyWith(
+        individualStockRatio: newInd,
+        indexStockRatio: newIndex,
+      ));
     });
+
     on<IndexStockRatioChanged>((event, emit) {
-      emit(state.copyWith(indexStockRatio: event.indexStockRatio));
+      double newIndex = event.indexStockRatio;
+      double newInd = 100 - newIndex;
+      emit(state.copyWith(
+        indexStockRatio: newIndex,
+        individualStockRatio: newInd,
+      ));
     });
+
+    // 채권 세부 설정 모드: 개별 채권과 지수 채권의 합이 100이 되어야 함.
     on<IndividualBondRatioChanged>((event, emit) {
-      emit(state.copyWith(individualBondRatio: event.individualBondRatio));
+      double newIndBond = event.individualBondRatio;
+      double newIndexBond = 100 - newIndBond;
+      emit(state.copyWith(
+        individualBondRatio: newIndBond,
+        indexBondRatio: newIndexBond,
+      ));
     });
+
     on<IndexBondRatioChanged>((event, emit) {
-      emit(state.copyWith(indexBondRatio: event.indexBondRatio));
+      double newIndexBond = event.indexBondRatio;
+      double newIndBond = 100 - newIndexBond;
+      emit(state.copyWith(
+        indexBondRatio: newIndexBond,
+        individualBondRatio: newIndBond,
+      ));
     });
+
     on<ToggleStockDetail>((event, emit) {
       emit(state.copyWith(isStockDetailOn: !state.isStockDetailOn));
     });
+
     on<ToggleBondEvaluation>((event, emit) {
       emit(state.copyWith(
-          isBondEvaluationEnabled: !state.isBondEvaluationEnabled,
-          isBondDetailOn: false));
-    });
-    on<ToggleBondDetail>((event, emit) {
-      emit(state.copyWith(isBondDetailOn: !state.isBondDetailOn));
+        isBondEvaluationEnabled: !state.isBondEvaluationEnabled,
+      ));
     });
   }
 }

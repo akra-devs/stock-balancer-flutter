@@ -3,22 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
+import 'package:stock_rebalance/extensions.dart';
 import 'package:stock_rebalance/portfolio_tab.dart';
 
 part 'rebalancing_tab.freezed.dart';
-
-/// Extension: MoneyMaskedTextController에서 정수값을 쉽게 가져오기 위한 getter
-extension MoneyMaskedTextControllerInt on MoneyMaskedTextController {
-  int get intValue => numberValue.toInt();
-}
-
-final numberFormatter = NumberFormat('#,###');
-
-extension NumberFormatting on num {
-  String toNumberFormat() {
-    return numberFormatter.format(this.toInt());
-  }
-}
 
 ///────────────────────────────
 /// 계산 탭 Bloc 관련 코드 (상태값은 int로 관리)

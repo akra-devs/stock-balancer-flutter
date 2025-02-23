@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
+import 'package:stock_rebalance/extensions.dart';
 import 'package:stock_rebalance/rebalancing_tab.dart';
 import 'package:uuid/uuid.dart';
 

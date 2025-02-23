@@ -20,7 +20,9 @@ class PortfolioItem with _$PortfolioItem {
 @freezed
 class PortfolioEvent with _$PortfolioEvent {
   const factory PortfolioEvent.add(PortfolioItem item) = _AddPortfolioItem;
-  const factory PortfolioEvent.remove(PortfolioItem item) = _RemovePortfolioItem;
+
+  const factory PortfolioEvent.remove(PortfolioItem item) =
+      _RemovePortfolioItem;
 // 추후 수정 이벤트도 추가 가능
 }
 
@@ -38,11 +40,11 @@ class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
     on<_AddPortfolioItem>((event, emit) {
       final newList = List<PortfolioItem>.from(state.items)..add(event.item);
       newList.sort((a, b) => b.savedAt.compareTo(a.savedAt));
-      emit(PortfolioState(items: newList));
+      emit(state.copyWith(items: newList));
     });
     on<_RemovePortfolioItem>((event, emit) {
       final newList = List<PortfolioItem>.from(state.items)..remove(event.item);
-      emit(PortfolioState(items: newList));
+      emit(state.copyWith(items: newList));
     });
   }
 }
@@ -69,7 +71,7 @@ class PortfolioPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 final item = state.items[index];
                 final dateStr =
-                DateFormat('yyyy-MM-dd HH:mm').format(item.savedAt);
+                    DateFormat('yyyy-MM-dd HH:mm').format(item.savedAt);
                 final isPositive = item.rebalanceAmount > 0;
                 final action = isPositive ? '매도' : '매수';
                 final amountStr =
@@ -95,13 +97,10 @@ class PortfolioPage extends StatelessWidget {
                         .add(PortfolioEvent.remove(item));
                   },
                   child: Card(
-                    margin:
-                    EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     child: ListTile(
                       leading: Icon(
-                        isPositive
-                            ? Icons.arrow_upward
-                            : Icons.arrow_downward,
+                        isPositive ? Icons.arrow_upward : Icons.arrow_downward,
                         color: isPositive ? Colors.green : Colors.red,
                       ),
                       title: Text(dateStr),
@@ -129,12 +128,12 @@ class PortfolioPage extends StatelessWidget {
 /// 포트폴리오 상세보기 페이지: 선택한 항목의 세부 정보를 표시
 class PortfolioDetailPage extends StatelessWidget {
   final PortfolioItem item;
+
   const PortfolioDetailPage({Key? key, required this.item}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final dateStr =
-    DateFormat('yyyy-MM-dd HH:mm').format(item.savedAt);
+    final dateStr = DateFormat('yyyy-MM-dd HH:mm').format(item.savedAt);
     final isPositive = item.rebalanceAmount > 0;
     final action = isPositive ? '매도' : '매수';
 

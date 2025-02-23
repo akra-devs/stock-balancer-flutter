@@ -16,10 +16,9 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$PortfolioItem {
-  String get id => throw _privateConstructorUsedError; // 각 항목의 고유 식별자
+  String get id => throw _privateConstructorUsedError;
   DateTime get savedAt => throw _privateConstructorUsedError;
-  double get rebalanceAmount =>
-      throw _privateConstructorUsedError; // 양수: 매도, 음수: 매수
+  double get rebalanceAmount => throw _privateConstructorUsedError;
   double get totalInvestment => throw _privateConstructorUsedError;
   double get currentStockValue => throw _privateConstructorUsedError;
 
@@ -162,12 +161,10 @@ class _$PortfolioItemImpl implements _PortfolioItem {
 
   @override
   final String id;
-// 각 항목의 고유 식별자
   @override
   final DateTime savedAt;
   @override
   final double rebalanceAmount;
-// 양수: 매도, 음수: 매수
   @override
   final double totalInvestment;
   @override
@@ -215,11 +212,11 @@ abstract class _PortfolioItem implements PortfolioItem {
       required final double currentStockValue}) = _$PortfolioItemImpl;
 
   @override
-  String get id; // 각 항목의 고유 식별자
+  String get id;
   @override
   DateTime get savedAt;
   @override
-  double get rebalanceAmount; // 양수: 매도, 음수: 매수
+  double get rebalanceAmount;
   @override
   double get totalInvestment;
   @override

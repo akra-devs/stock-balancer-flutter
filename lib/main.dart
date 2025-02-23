@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 part 'main.freezed.dart';
 
@@ -104,6 +106,9 @@ class RebalancingHomePage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Text('삭제 후 bottomNavigationBar 추가 예정'),
       ),
     );
   }
@@ -287,7 +292,7 @@ class RebalancingRatioCard extends StatelessWidget {
                       bloc.add(BondRatioChanged(value));
                     },
                   ),
-                  if (state.isBondDetailOn) ...[
+                  if (false) ...[
                     SizedBox(height: 10),
                     Text(
                         '개별 채권 비중 (%) : ${state.individualBondRatio.toStringAsFixed(0)}'),

@@ -16,14 +16,14 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$RebalancingState {
-  String get totalInvestment => throw _privateConstructorUsedError;
-  String get currentStockValue => throw _privateConstructorUsedError;
-  String get currentBondValue => throw _privateConstructorUsedError;
-  double get cashRatio => throw _privateConstructorUsedError;
-  double get stockRatio => throw _privateConstructorUsedError;
-  double get bondRatio => throw _privateConstructorUsedError;
-  double get individualStockRatio => throw _privateConstructorUsedError;
-  double get indexStockRatio => throw _privateConstructorUsedError;
+  int get totalInvestment => throw _privateConstructorUsedError;
+  int get currentStockValue => throw _privateConstructorUsedError;
+  int get currentBondValue => throw _privateConstructorUsedError;
+  int get cashRatio => throw _privateConstructorUsedError;
+  int get stockRatio => throw _privateConstructorUsedError;
+  int get bondRatio => throw _privateConstructorUsedError;
+  int get individualStockRatio => throw _privateConstructorUsedError;
+  int get indexStockRatio => throw _privateConstructorUsedError;
   bool get isStockDetailOn => throw _privateConstructorUsedError;
   bool get isBondEvaluationEnabled => throw _privateConstructorUsedError;
 
@@ -41,14 +41,14 @@ abstract class $RebalancingStateCopyWith<$Res> {
       _$RebalancingStateCopyWithImpl<$Res, RebalancingState>;
   @useResult
   $Res call(
-      {String totalInvestment,
-      String currentStockValue,
-      String currentBondValue,
-      double cashRatio,
-      double stockRatio,
-      double bondRatio,
-      double individualStockRatio,
-      double indexStockRatio,
+      {int totalInvestment,
+      int currentStockValue,
+      int currentBondValue,
+      int cashRatio,
+      int stockRatio,
+      int bondRatio,
+      int individualStockRatio,
+      int indexStockRatio,
       bool isStockDetailOn,
       bool isBondEvaluationEnabled});
 }
@@ -83,35 +83,35 @@ class _$RebalancingStateCopyWithImpl<$Res, $Val extends RebalancingState>
       totalInvestment: null == totalInvestment
           ? _value.totalInvestment
           : totalInvestment // ignore: cast_nullable_to_non_nullable
-              as String,
+              as int,
       currentStockValue: null == currentStockValue
           ? _value.currentStockValue
           : currentStockValue // ignore: cast_nullable_to_non_nullable
-              as String,
+              as int,
       currentBondValue: null == currentBondValue
           ? _value.currentBondValue
           : currentBondValue // ignore: cast_nullable_to_non_nullable
-              as String,
+              as int,
       cashRatio: null == cashRatio
           ? _value.cashRatio
           : cashRatio // ignore: cast_nullable_to_non_nullable
-              as double,
+              as int,
       stockRatio: null == stockRatio
           ? _value.stockRatio
           : stockRatio // ignore: cast_nullable_to_non_nullable
-              as double,
+              as int,
       bondRatio: null == bondRatio
           ? _value.bondRatio
           : bondRatio // ignore: cast_nullable_to_non_nullable
-              as double,
+              as int,
       individualStockRatio: null == individualStockRatio
           ? _value.individualStockRatio
           : individualStockRatio // ignore: cast_nullable_to_non_nullable
-              as double,
+              as int,
       indexStockRatio: null == indexStockRatio
           ? _value.indexStockRatio
           : indexStockRatio // ignore: cast_nullable_to_non_nullable
-              as double,
+              as int,
       isStockDetailOn: null == isStockDetailOn
           ? _value.isStockDetailOn
           : isStockDetailOn // ignore: cast_nullable_to_non_nullable
@@ -133,14 +133,14 @@ abstract class _$$RebalancingStateImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String totalInvestment,
-      String currentStockValue,
-      String currentBondValue,
-      double cashRatio,
-      double stockRatio,
-      double bondRatio,
-      double individualStockRatio,
-      double indexStockRatio,
+      {int totalInvestment,
+      int currentStockValue,
+      int currentBondValue,
+      int cashRatio,
+      int stockRatio,
+      int bondRatio,
+      int individualStockRatio,
+      int indexStockRatio,
       bool isStockDetailOn,
       bool isBondEvaluationEnabled});
 }
@@ -173,35 +173,35 @@ class __$$RebalancingStateImplCopyWithImpl<$Res>
       totalInvestment: null == totalInvestment
           ? _value.totalInvestment
           : totalInvestment // ignore: cast_nullable_to_non_nullable
-              as String,
+              as int,
       currentStockValue: null == currentStockValue
           ? _value.currentStockValue
           : currentStockValue // ignore: cast_nullable_to_non_nullable
-              as String,
+              as int,
       currentBondValue: null == currentBondValue
           ? _value.currentBondValue
           : currentBondValue // ignore: cast_nullable_to_non_nullable
-              as String,
+              as int,
       cashRatio: null == cashRatio
           ? _value.cashRatio
           : cashRatio // ignore: cast_nullable_to_non_nullable
-              as double,
+              as int,
       stockRatio: null == stockRatio
           ? _value.stockRatio
           : stockRatio // ignore: cast_nullable_to_non_nullable
-              as double,
+              as int,
       bondRatio: null == bondRatio
           ? _value.bondRatio
           : bondRatio // ignore: cast_nullable_to_non_nullable
-              as double,
+              as int,
       individualStockRatio: null == individualStockRatio
           ? _value.individualStockRatio
           : individualStockRatio // ignore: cast_nullable_to_non_nullable
-              as double,
+              as int,
       indexStockRatio: null == indexStockRatio
           ? _value.indexStockRatio
           : indexStockRatio // ignore: cast_nullable_to_non_nullable
-              as double,
+              as int,
       isStockDetailOn: null == isStockDetailOn
           ? _value.isStockDetailOn
           : isStockDetailOn // ignore: cast_nullable_to_non_nullable
@@ -218,41 +218,41 @@ class __$$RebalancingStateImplCopyWithImpl<$Res>
 
 class _$RebalancingStateImpl implements _RebalancingState {
   _$RebalancingStateImpl(
-      {this.totalInvestment = "0.0",
-      this.currentStockValue = "0.0",
-      this.currentBondValue = "0.0",
-      this.cashRatio = 0.0,
-      this.stockRatio = 0.0,
-      this.bondRatio = 0.0,
-      this.individualStockRatio = 0.0,
-      this.indexStockRatio = 0.0,
+      {this.totalInvestment = 0,
+      this.currentStockValue = 0,
+      this.currentBondValue = 0,
+      this.cashRatio = 0,
+      this.stockRatio = 0,
+      this.bondRatio = 0,
+      this.individualStockRatio = 0,
+      this.indexStockRatio = 0,
       this.isStockDetailOn = false,
       this.isBondEvaluationEnabled = false});
 
   @override
   @JsonKey()
-  final String totalInvestment;
+  final int totalInvestment;
   @override
   @JsonKey()
-  final String currentStockValue;
+  final int currentStockValue;
   @override
   @JsonKey()
-  final String currentBondValue;
+  final int currentBondValue;
   @override
   @JsonKey()
-  final double cashRatio;
+  final int cashRatio;
   @override
   @JsonKey()
-  final double stockRatio;
+  final int stockRatio;
   @override
   @JsonKey()
-  final double bondRatio;
+  final int bondRatio;
   @override
   @JsonKey()
-  final double individualStockRatio;
+  final int individualStockRatio;
   @override
   @JsonKey()
-  final double indexStockRatio;
+  final int indexStockRatio;
   @override
   @JsonKey()
   final bool isStockDetailOn;
@@ -319,33 +319,33 @@ class _$RebalancingStateImpl implements _RebalancingState {
 
 abstract class _RebalancingState implements RebalancingState {
   factory _RebalancingState(
-      {final String totalInvestment,
-      final String currentStockValue,
-      final String currentBondValue,
-      final double cashRatio,
-      final double stockRatio,
-      final double bondRatio,
-      final double individualStockRatio,
-      final double indexStockRatio,
+      {final int totalInvestment,
+      final int currentStockValue,
+      final int currentBondValue,
+      final int cashRatio,
+      final int stockRatio,
+      final int bondRatio,
+      final int individualStockRatio,
+      final int indexStockRatio,
       final bool isStockDetailOn,
       final bool isBondEvaluationEnabled}) = _$RebalancingStateImpl;
 
   @override
-  String get totalInvestment;
+  int get totalInvestment;
   @override
-  String get currentStockValue;
+  int get currentStockValue;
   @override
-  String get currentBondValue;
+  int get currentBondValue;
   @override
-  double get cashRatio;
+  int get cashRatio;
   @override
-  double get stockRatio;
+  int get stockRatio;
   @override
-  double get bondRatio;
+  int get bondRatio;
   @override
-  double get individualStockRatio;
+  int get individualStockRatio;
   @override
-  double get indexStockRatio;
+  int get indexStockRatio;
   @override
   bool get isStockDetailOn;
   @override

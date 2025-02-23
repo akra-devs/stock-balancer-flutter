@@ -10,14 +10,24 @@ void main() {
 class RebalancingApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: '리벨런싱 앱',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        brightness: Brightness.light,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<RebalancingBloc>(
+          create: (_) => RebalancingBloc(),
+        ),
+        BlocProvider<PortfolioBloc>(
+          create: (_) => PortfolioBloc(),
+        ),
+      ],
+      child: MaterialApp(
+        title: '리벨런싱 앱',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          brightness: Brightness.light,
+        ),
+        darkTheme: ThemeData(brightness: Brightness.dark),
+        home: MainScreen(),
       ),
-      darkTheme: ThemeData(brightness: Brightness.dark),
-      home: MainScreen(),
     );
   }
 }
@@ -30,18 +40,10 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  /// 각 탭을 BlocProvider로 감싸서, 필요한 Bloc을 주입해 줍니다.
+  // 각 탭은 별도의 파일에 구현된 위젯을 사용합니다.
   final List<Widget> _pages = [
-    // 계산 탭
-    BlocProvider(
-      create: (_) => RebalancingBloc(),
-      child: RebalancingHomePage(),
-    ),
-    // 포트폴리오 탭
-    BlocProvider(
-      create: (_) => PortfolioBloc(),
-      child: PortfolioPage(),
-    ),
+    RebalancingHomePage(), // 계산 탭
+    PortfolioPage(),       // 포트폴리오 탭
   ];
 
   void _onItemTapped(int index) {

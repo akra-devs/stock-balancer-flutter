@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
+import 'package:stock_rebalance/rebalancing_tab.dart';
 import 'package:uuid/uuid.dart';
 
 part 'portfolio_tab.freezed.dart';
@@ -90,7 +91,7 @@ class PortfolioPage extends StatelessWidget {
               final dateStr = DateFormat('yyyy-MM-dd HH:mm').format(item.savedAt);
               final isPositive = item.rebalanceAmount > 0;
               final action = isPositive ? '매도' : '매수';
-              final amountStr = '${isPositive ? '+' : '-'}${item.rebalanceAmount.abs().toStringAsFixed(2)}';
+              final amountStr = '${isPositive ? '+' : '-'}${item.rebalanceAmount.abs().toNumberFormat()}';
 
               return Dismissible(
                 key: Key(item.id),
@@ -158,12 +159,12 @@ class PortfolioDetailPage extends StatelessWidget {
           children: [
             Text('저장 일시: $dateStr', style: TextStyle(fontSize: 16)),
             SizedBox(height: 10),
-            Text('총 매수원금: ${item.totalInvestment}', style: TextStyle(fontSize: 16)),
+            Text('총 매수원금: ${item.totalInvestment.toNumberFormat()} 원', style: TextStyle(fontSize: 16)),
             SizedBox(height: 10),
-            Text('현재 주식 평가 금액: ${item.currentStockValue}', style: TextStyle(fontSize: 16)),
+            Text('현재 주식 평가 금액: ${item.currentStockValue.toNumberFormat()} 원', style: TextStyle(fontSize: 16)),
             SizedBox(height: 10),
             Text(
-              '리벨런싱 결과: 주식을 ${item.rebalanceAmount.abs().toStringAsFixed(2)} 만큼 $action 하세요.',
+              '리벨런싱 결과: 주식을 ${item.rebalanceAmount.abs().toNumberFormat()} 원 만큼 $action 하세요.',
               style: TextStyle(fontSize: 16),
             ),
           ],

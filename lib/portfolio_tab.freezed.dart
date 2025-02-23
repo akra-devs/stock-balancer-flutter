@@ -16,6 +16,7 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$PortfolioItem {
+  String get id => throw _privateConstructorUsedError; // 각 항목의 고유 식별자
   DateTime get savedAt => throw _privateConstructorUsedError;
   double get rebalanceAmount =>
       throw _privateConstructorUsedError; // 양수: 매도, 음수: 매수
@@ -36,7 +37,8 @@ abstract class $PortfolioItemCopyWith<$Res> {
       _$PortfolioItemCopyWithImpl<$Res, PortfolioItem>;
   @useResult
   $Res call(
-      {DateTime savedAt,
+      {String id,
+      DateTime savedAt,
       double rebalanceAmount,
       double totalInvestment,
       double currentStockValue});
@@ -57,12 +59,17 @@ class _$PortfolioItemCopyWithImpl<$Res, $Val extends PortfolioItem>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? savedAt = null,
     Object? rebalanceAmount = null,
     Object? totalInvestment = null,
     Object? currentStockValue = null,
   }) {
     return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
       savedAt: null == savedAt
           ? _value.savedAt
           : savedAt // ignore: cast_nullable_to_non_nullable
@@ -92,7 +99,8 @@ abstract class _$$PortfolioItemImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {DateTime savedAt,
+      {String id,
+      DateTime savedAt,
       double rebalanceAmount,
       double totalInvestment,
       double currentStockValue});
@@ -111,12 +119,17 @@ class __$$PortfolioItemImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? savedAt = null,
     Object? rebalanceAmount = null,
     Object? totalInvestment = null,
     Object? currentStockValue = null,
   }) {
     return _then(_$PortfolioItemImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
       savedAt: null == savedAt
           ? _value.savedAt
           : savedAt // ignore: cast_nullable_to_non_nullable
@@ -141,11 +154,15 @@ class __$$PortfolioItemImplCopyWithImpl<$Res>
 
 class _$PortfolioItemImpl implements _PortfolioItem {
   _$PortfolioItemImpl(
-      {required this.savedAt,
+      {required this.id,
+      required this.savedAt,
       required this.rebalanceAmount,
       required this.totalInvestment,
       required this.currentStockValue});
 
+  @override
+  final String id;
+// 각 항목의 고유 식별자
   @override
   final DateTime savedAt;
   @override
@@ -158,7 +175,7 @@ class _$PortfolioItemImpl implements _PortfolioItem {
 
   @override
   String toString() {
-    return 'PortfolioItem(savedAt: $savedAt, rebalanceAmount: $rebalanceAmount, totalInvestment: $totalInvestment, currentStockValue: $currentStockValue)';
+    return 'PortfolioItem(id: $id, savedAt: $savedAt, rebalanceAmount: $rebalanceAmount, totalInvestment: $totalInvestment, currentStockValue: $currentStockValue)';
   }
 
   @override
@@ -166,6 +183,7 @@ class _$PortfolioItemImpl implements _PortfolioItem {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$PortfolioItemImpl &&
+            (identical(other.id, id) || other.id == id) &&
             (identical(other.savedAt, savedAt) || other.savedAt == savedAt) &&
             (identical(other.rebalanceAmount, rebalanceAmount) ||
                 other.rebalanceAmount == rebalanceAmount) &&
@@ -176,7 +194,7 @@ class _$PortfolioItemImpl implements _PortfolioItem {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, savedAt, rebalanceAmount,
+  int get hashCode => Object.hash(runtimeType, id, savedAt, rebalanceAmount,
       totalInvestment, currentStockValue);
 
   /// Create a copy of PortfolioItem
@@ -190,11 +208,14 @@ class _$PortfolioItemImpl implements _PortfolioItem {
 
 abstract class _PortfolioItem implements PortfolioItem {
   factory _PortfolioItem(
-      {required final DateTime savedAt,
+      {required final String id,
+      required final DateTime savedAt,
       required final double rebalanceAmount,
       required final double totalInvestment,
       required final double currentStockValue}) = _$PortfolioItemImpl;
 
+  @override
+  String get id; // 각 항목의 고유 식별자
   @override
   DateTime get savedAt;
   @override
@@ -219,18 +240,21 @@ mixin _$PortfolioEvent {
   TResult when<TResult extends Object?>({
     required TResult Function(PortfolioItem item) add,
     required TResult Function(PortfolioItem item) remove,
+    required TResult Function(PortfolioItem item) change,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(PortfolioItem item)? add,
     TResult? Function(PortfolioItem item)? remove,
+    TResult? Function(PortfolioItem item)? change,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(PortfolioItem item)? add,
     TResult Function(PortfolioItem item)? remove,
+    TResult Function(PortfolioItem item)? change,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -238,18 +262,21 @@ mixin _$PortfolioEvent {
   TResult map<TResult extends Object?>({
     required TResult Function(_AddPortfolioItem value) add,
     required TResult Function(_RemovePortfolioItem value) remove,
+    required TResult Function(_ChangePortfolioItem value) change,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_AddPortfolioItem value)? add,
     TResult? Function(_RemovePortfolioItem value)? remove,
+    TResult? Function(_ChangePortfolioItem value)? change,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_AddPortfolioItem value)? add,
     TResult Function(_RemovePortfolioItem value)? remove,
+    TResult Function(_ChangePortfolioItem value)? change,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -384,6 +411,7 @@ class _$AddPortfolioItemImpl implements _AddPortfolioItem {
   TResult when<TResult extends Object?>({
     required TResult Function(PortfolioItem item) add,
     required TResult Function(PortfolioItem item) remove,
+    required TResult Function(PortfolioItem item) change,
   }) {
     return add(item);
   }
@@ -393,6 +421,7 @@ class _$AddPortfolioItemImpl implements _AddPortfolioItem {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(PortfolioItem item)? add,
     TResult? Function(PortfolioItem item)? remove,
+    TResult? Function(PortfolioItem item)? change,
   }) {
     return add?.call(item);
   }
@@ -402,6 +431,7 @@ class _$AddPortfolioItemImpl implements _AddPortfolioItem {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(PortfolioItem item)? add,
     TResult Function(PortfolioItem item)? remove,
+    TResult Function(PortfolioItem item)? change,
     required TResult orElse(),
   }) {
     if (add != null) {
@@ -415,6 +445,7 @@ class _$AddPortfolioItemImpl implements _AddPortfolioItem {
   TResult map<TResult extends Object?>({
     required TResult Function(_AddPortfolioItem value) add,
     required TResult Function(_RemovePortfolioItem value) remove,
+    required TResult Function(_ChangePortfolioItem value) change,
   }) {
     return add(this);
   }
@@ -424,6 +455,7 @@ class _$AddPortfolioItemImpl implements _AddPortfolioItem {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_AddPortfolioItem value)? add,
     TResult? Function(_RemovePortfolioItem value)? remove,
+    TResult? Function(_ChangePortfolioItem value)? change,
   }) {
     return add?.call(this);
   }
@@ -433,6 +465,7 @@ class _$AddPortfolioItemImpl implements _AddPortfolioItem {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_AddPortfolioItem value)? add,
     TResult Function(_RemovePortfolioItem value)? remove,
+    TResult Function(_ChangePortfolioItem value)? change,
     required TResult orElse(),
   }) {
     if (add != null) {
@@ -533,6 +566,7 @@ class _$RemovePortfolioItemImpl implements _RemovePortfolioItem {
   TResult when<TResult extends Object?>({
     required TResult Function(PortfolioItem item) add,
     required TResult Function(PortfolioItem item) remove,
+    required TResult Function(PortfolioItem item) change,
   }) {
     return remove(item);
   }
@@ -542,6 +576,7 @@ class _$RemovePortfolioItemImpl implements _RemovePortfolioItem {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(PortfolioItem item)? add,
     TResult? Function(PortfolioItem item)? remove,
+    TResult? Function(PortfolioItem item)? change,
   }) {
     return remove?.call(item);
   }
@@ -551,6 +586,7 @@ class _$RemovePortfolioItemImpl implements _RemovePortfolioItem {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(PortfolioItem item)? add,
     TResult Function(PortfolioItem item)? remove,
+    TResult Function(PortfolioItem item)? change,
     required TResult orElse(),
   }) {
     if (remove != null) {
@@ -564,6 +600,7 @@ class _$RemovePortfolioItemImpl implements _RemovePortfolioItem {
   TResult map<TResult extends Object?>({
     required TResult Function(_AddPortfolioItem value) add,
     required TResult Function(_RemovePortfolioItem value) remove,
+    required TResult Function(_ChangePortfolioItem value) change,
   }) {
     return remove(this);
   }
@@ -573,6 +610,7 @@ class _$RemovePortfolioItemImpl implements _RemovePortfolioItem {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_AddPortfolioItem value)? add,
     TResult? Function(_RemovePortfolioItem value)? remove,
+    TResult? Function(_ChangePortfolioItem value)? change,
   }) {
     return remove?.call(this);
   }
@@ -582,6 +620,7 @@ class _$RemovePortfolioItemImpl implements _RemovePortfolioItem {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_AddPortfolioItem value)? add,
     TResult Function(_RemovePortfolioItem value)? remove,
+    TResult Function(_ChangePortfolioItem value)? change,
     required TResult orElse(),
   }) {
     if (remove != null) {
@@ -607,8 +646,163 @@ abstract class _RemovePortfolioItem implements PortfolioEvent {
 }
 
 /// @nodoc
+abstract class _$$ChangePortfolioItemImplCopyWith<$Res>
+    implements $PortfolioEventCopyWith<$Res> {
+  factory _$$ChangePortfolioItemImplCopyWith(_$ChangePortfolioItemImpl value,
+          $Res Function(_$ChangePortfolioItemImpl) then) =
+      __$$ChangePortfolioItemImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({PortfolioItem item});
+
+  @override
+  $PortfolioItemCopyWith<$Res> get item;
+}
+
+/// @nodoc
+class __$$ChangePortfolioItemImplCopyWithImpl<$Res>
+    extends _$PortfolioEventCopyWithImpl<$Res, _$ChangePortfolioItemImpl>
+    implements _$$ChangePortfolioItemImplCopyWith<$Res> {
+  __$$ChangePortfolioItemImplCopyWithImpl(_$ChangePortfolioItemImpl _value,
+      $Res Function(_$ChangePortfolioItemImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of PortfolioEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? item = null,
+  }) {
+    return _then(_$ChangePortfolioItemImpl(
+      null == item
+          ? _value.item
+          : item // ignore: cast_nullable_to_non_nullable
+              as PortfolioItem,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$ChangePortfolioItemImpl implements _ChangePortfolioItem {
+  const _$ChangePortfolioItemImpl(this.item);
+
+  @override
+  final PortfolioItem item;
+
+  @override
+  String toString() {
+    return 'PortfolioEvent.change(item: $item)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ChangePortfolioItemImpl &&
+            (identical(other.item, item) || other.item == item));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, item);
+
+  /// Create a copy of PortfolioEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ChangePortfolioItemImplCopyWith<_$ChangePortfolioItemImpl> get copyWith =>
+      __$$ChangePortfolioItemImplCopyWithImpl<_$ChangePortfolioItemImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(PortfolioItem item) add,
+    required TResult Function(PortfolioItem item) remove,
+    required TResult Function(PortfolioItem item) change,
+  }) {
+    return change(item);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(PortfolioItem item)? add,
+    TResult? Function(PortfolioItem item)? remove,
+    TResult? Function(PortfolioItem item)? change,
+  }) {
+    return change?.call(item);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(PortfolioItem item)? add,
+    TResult Function(PortfolioItem item)? remove,
+    TResult Function(PortfolioItem item)? change,
+    required TResult orElse(),
+  }) {
+    if (change != null) {
+      return change(item);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_AddPortfolioItem value) add,
+    required TResult Function(_RemovePortfolioItem value) remove,
+    required TResult Function(_ChangePortfolioItem value) change,
+  }) {
+    return change(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_AddPortfolioItem value)? add,
+    TResult? Function(_RemovePortfolioItem value)? remove,
+    TResult? Function(_ChangePortfolioItem value)? change,
+  }) {
+    return change?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_AddPortfolioItem value)? add,
+    TResult Function(_RemovePortfolioItem value)? remove,
+    TResult Function(_ChangePortfolioItem value)? change,
+    required TResult orElse(),
+  }) {
+    if (change != null) {
+      return change(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ChangePortfolioItem implements PortfolioEvent {
+  const factory _ChangePortfolioItem(final PortfolioItem item) =
+      _$ChangePortfolioItemImpl;
+
+  @override
+  PortfolioItem get item;
+
+  /// Create a copy of PortfolioEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ChangePortfolioItemImplCopyWith<_$ChangePortfolioItemImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
 mixin _$PortfolioState {
-  List<PortfolioItem> get items => throw _privateConstructorUsedError;
+  Map<String, PortfolioItem> get items => throw _privateConstructorUsedError;
 
   /// Create a copy of PortfolioState
   /// with the given fields replaced by the non-null parameter values.
@@ -623,7 +817,7 @@ abstract class $PortfolioStateCopyWith<$Res> {
           PortfolioState value, $Res Function(PortfolioState) then) =
       _$PortfolioStateCopyWithImpl<$Res, PortfolioState>;
   @useResult
-  $Res call({List<PortfolioItem> items});
+  $Res call({Map<String, PortfolioItem> items});
 }
 
 /// @nodoc
@@ -647,7 +841,7 @@ class _$PortfolioStateCopyWithImpl<$Res, $Val extends PortfolioState>
       items: null == items
           ? _value.items
           : items // ignore: cast_nullable_to_non_nullable
-              as List<PortfolioItem>,
+              as Map<String, PortfolioItem>,
     ) as $Val);
   }
 }
@@ -660,7 +854,7 @@ abstract class _$$PortfolioStateImplCopyWith<$Res>
       __$$PortfolioStateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({List<PortfolioItem> items});
+  $Res call({Map<String, PortfolioItem> items});
 }
 
 /// @nodoc
@@ -682,7 +876,7 @@ class __$$PortfolioStateImplCopyWithImpl<$Res>
       items: null == items
           ? _value._items
           : items // ignore: cast_nullable_to_non_nullable
-              as List<PortfolioItem>,
+              as Map<String, PortfolioItem>,
     ));
   }
 }
@@ -690,16 +884,16 @@ class __$$PortfolioStateImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$PortfolioStateImpl implements _PortfolioState {
-  _$PortfolioStateImpl({final List<PortfolioItem> items = const []})
+  _$PortfolioStateImpl({final Map<String, PortfolioItem> items = const {}})
       : _items = items;
 
-  final List<PortfolioItem> _items;
+  final Map<String, PortfolioItem> _items;
   @override
   @JsonKey()
-  List<PortfolioItem> get items {
-    if (_items is EqualUnmodifiableListView) return _items;
+  Map<String, PortfolioItem> get items {
+    if (_items is EqualUnmodifiableMapView) return _items;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_items);
+    return EqualUnmodifiableMapView(_items);
   }
 
   @override
@@ -730,11 +924,11 @@ class _$PortfolioStateImpl implements _PortfolioState {
 }
 
 abstract class _PortfolioState implements PortfolioState {
-  factory _PortfolioState({final List<PortfolioItem> items}) =
+  factory _PortfolioState({final Map<String, PortfolioItem> items}) =
       _$PortfolioStateImpl;
 
   @override
-  List<PortfolioItem> get items;
+  Map<String, PortfolioItem> get items;
 
   /// Create a copy of PortfolioState
   /// with the given fields replaced by the non-null parameter values.

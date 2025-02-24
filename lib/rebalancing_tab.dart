@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:stock_rebalance/extensions.dart';
-import 'package:stock_rebalance/portfolio_tab.dart'; // 확장함수(toNumberFormat) 포함
+import 'package:stock_rebalance/portfolio_tab.dart'; // 예: int.toNumberFormat() 확장 함수
 
 part 'rebalancing_tab.freezed.dart';
 
@@ -12,71 +12,65 @@ part 'rebalancing_tab.freezed.dart';
 ///────────────────────────────
 
 class RebalanceResult {
-  final double overallAdjustment;
-  final double? individualAdjustment;
-  final double? indexAdjustment;
+  final double cashAdjustmentAmount;
+  final double stockAdjustmentAmount;
+  final double bondAdjustmentAmount;
+  final double individualAdjustment;
+  final double indexAdjustment;
 
   RebalanceResult({
-    required this.overallAdjustment,
-    this.individualAdjustment,
-    this.indexAdjustment,
+    required this.cashAdjustmentAmount,
+    required this.stockAdjustmentAmount,
+    required this.bondAdjustmentAmount,
+    required this.individualAdjustment,
+    required this.indexAdjustment,
   });
 }
 
-/// 계산 로직을 분리한 함수
-/// - 세부 설정이 off이면 단순 계산 (기존 로직)
-/// - 세부 설정이 on이면 추가로 총 지수 주식 매수 금액과 현재 지수 주식 평가 금액을 사용
-RebalanceResult calculateRebalance(
-  RebalancingState state, {
-  int? totalIndexPurchase, // 세부 설정 모드일 때 입력된 총 지수 주식 매수 금액
-  int? currentIndexValue, // 세부 설정 모드일 때 입력된 현재 지수 주식 평가 금액
-}) {
-  if (!state.isStockDetailOn) {
-    // 단순 계산: 현금비중 기반 계산
-    double totalInvestment = state.totalInvestment.toDouble();
-    double currentStockValue = state.currentStockValue.toDouble();
-    double cashRatio = state.cashRatio.toDouble();
-    double impliedCash = totalInvestment * (cashRatio / (100 - cashRatio));
-    double targetCash = (cashRatio / 100) * (impliedCash + currentStockValue);
-    double adjustment = targetCash - impliedCash;
-    return RebalanceResult(overallAdjustment: adjustment);
-  } else {
-    // 세부 설정 모드: 개별주식과 지수주식을 분리하여 계산
-    if (totalIndexPurchase == null || currentIndexValue == null) {
-      throw Exception("세부 설정 모드에서는 지수 주식 관련 값이 필요합니다.");
-    }
-    // 가정: 전체 주식 매수 금액은 두 부분의 합이고, 전체 주식 평가 금액도 두 부분의 합입니다.
-    // 개별 주식 값은:
-    double totalIndividualPurchase =
-        state.totalInvestment.toDouble() - totalIndexPurchase.toDouble();
-    double currentIndividualValue =
-        state.currentStockValue.toDouble() - currentIndexValue.toDouble();
+/// 리벨런싱 계산 로직을 분리한 함수
+RebalanceResult calculateRebalance(RebalancingState state) {
+  double totalInvestment = state.totalInvestment.toDouble();
+  double currentStockValue = state.currentStockValue.toDouble();
+  double currentBondValue = state.currentBondValue.toDouble();
+  double cashRatio = state.cashRatio.toDouble();
+  double stockRatio = state.stockRatio.toDouble();
+  double bondRatio = state.bondRatio.toDouble();
+  double individualStockRatio = state.individualStockRatio.toDouble();
+  double indexStockRatio = state.indexStockRatio.toDouble();
+  double currentIndexValue = state.currentIndexValue.toDouble();
 
-    // 각 비중 설정 (전체 주식 비중은 100%이고, 세부 설정으로 개별/지수로 분리)
-    double individualRatio = state.individualStockRatio.toDouble();
-    double indexRatio = state.indexStockRatio.toDouble();
+  // 계산 현금 변수
+  double pastCashAmount =
+      totalInvestment * (((cashRatio + bondRatio)) / stockRatio);
+  double afterCashAmount = ((pastCashAmount + currentStockValue) * cashRatio);
+  double rebalanceCashAmount = afterCashAmount - pastCashAmount;
 
-    // 개별 주식 계산
-    double impliedCashInd =
-        totalIndividualPurchase * (individualRatio / (100 - individualRatio));
-    double targetCashInd =
-        (individualRatio / 100) * (impliedCashInd + currentIndividualValue);
-    double individualAdjustment = targetCashInd - impliedCashInd;
+  // 게산 주식 변수
+  double pastStockAmount = totalInvestment * stockRatio;
+  double afterStockAmount = (pastCashAmount + currentStockValue) * stockRatio;
+  double rebalanceStockAmount = afterStockAmount - pastStockAmount;
 
-    // 지수 주식 계산
-    double impliedCashIdx =
-        totalIndexPurchase.toDouble() * (indexRatio / (100 - indexRatio));
-    double targetCashIdx =
-        (indexRatio / 100) * (impliedCashIdx + currentIndexValue.toDouble());
-    double indexAdjustment = targetCashIdx - impliedCashIdx;
+  // 계산 채권 변수
+  double pastBondAmount = totalInvestment * bondRatio;
+  double afterBondAmount = (pastCashAmount + currentStockValue) * bondRatio;
+  double rebalanceBondAmount = afterBondAmount - pastBondAmount;
 
-    double overallAdjustment = individualAdjustment + indexAdjustment;
-    return RebalanceResult(
-      overallAdjustment: overallAdjustment,
-      individualAdjustment: individualAdjustment,
-      indexAdjustment: indexAdjustment,
-    );
-  }
+  // var result = switch (state.isStockDetailOn) {
+  //   false => (() {
+  //       var temp = totalInvestment.toInt();
+  //       return totalInvestment * 2;
+  //     })(),
+  //   true => {},
+  // };
+
+  return RebalanceResult(
+    cashAdjustmentAmount: rebalanceCashAmount,
+    stockAdjustmentAmount: rebalanceStockAmount,
+    bondAdjustmentAmount: rebalanceBondAmount,
+    individualAdjustment: 0,
+    // TODO: 구현 필요
+    indexAdjustment: 0,
+  );
 }
 
 ///────────────────────────────
@@ -137,6 +131,19 @@ class ToggleStockDetail extends RebalancingEvent {}
 
 class ToggleBondEvaluation extends RebalancingEvent {}
 
+// 추가: 세부 설정 관련 이벤트
+class TotalIndexPurchaseChanged extends RebalancingEvent {
+  final int totalIndexPurchase;
+
+  TotalIndexPurchaseChanged(this.totalIndexPurchase);
+}
+
+class CurrentIndexValueChanged extends RebalancingEvent {
+  final int currentIndexValue;
+
+  CurrentIndexValueChanged(this.currentIndexValue);
+}
+
 @freezed
 class RebalancingState with _$RebalancingState {
   factory RebalancingState({
@@ -150,6 +157,8 @@ class RebalancingState with _$RebalancingState {
     @Default(0) int indexStockRatio,
     @Default(false) bool isStockDetailOn,
     @Default(false) bool isBondEvaluationEnabled,
+    @Default(0) int totalIndexPurchase, // 추가: 총 지수 주식 매수 금액
+    @Default(0) int currentIndexValue, // 추가: 현재 지수 평가 금액
   }) = _RebalancingState;
 }
 
@@ -219,6 +228,12 @@ class RebalancingBloc extends Bloc<RebalancingEvent, RebalancingState> {
       emit(state.copyWith(
           isBondEvaluationEnabled: !state.isBondEvaluationEnabled));
     });
+    on<TotalIndexPurchaseChanged>((event, emit) {
+      emit(state.copyWith(totalIndexPurchase: event.totalIndexPurchase));
+    });
+    on<CurrentIndexValueChanged>((event, emit) {
+      emit(state.copyWith(currentIndexValue: event.currentIndexValue));
+    });
   }
 }
 
@@ -263,28 +278,21 @@ class RebalancingHomePage extends StatelessWidget {
                       SnackBar(content: Text('현금비중이 100% 이상일 수 없습니다.')));
                   return;
                 }
-                RebalanceResult result;
-                // 만약 세부 설정이 켜져 있다면, 추가 입력 필드의 값을 사용해야 합니다.
-                // 예를 들어, 아래는 임의로 추가 컨트롤러 값(totalIndexPurchase, currentIndexValue)을 사용한다고 가정합니다.
-                // 실제로는 세부 설정 UI에 별도의 입력 필드를 추가해야 합니다.
-                if (state.isStockDetailOn) {
-                  // 여기서는 예시로 100, 150을 사용합니다.
-                  result = calculateRebalance(state,
-                      totalIndexPurchase: 100, currentIndexValue: 150);
-                } else {
-                  result = calculateRebalance(state);
-                }
+                RebalanceResult result = calculateRebalance(state);
                 String overallText =
-                    '전체 리벨런싱 결과: 주식을 ${result.overallAdjustment.abs().toNumberFormat()}원 만큼 ${result.overallAdjustment > 0 ? '매도' : '매수'} 하세요.';
+                    '전체 리벨런싱 결과: 주식을 ${result.stockAdjustmentAmount.abs().toNumberFormat()}원 만큼 ${result.stockAdjustmentAmount > 0 ? '매도' : '매수'} 하세요.';
+                // TODO: 개별 주식 & 인덱스 주식 정보 필요
                 String detailText = '';
                 if (result.individualAdjustment != null &&
                     result.indexAdjustment != null) {
                   detailText =
-                      '\n개별 주식: ${result.individualAdjustment!.abs().toNumberFormat()}원 ${result.individualAdjustment! > 0 ? '매도' : '매수'}\n지수 주식: ${result.indexAdjustment!.abs().toNumberFormat()}원 ${result.indexAdjustment! > 0 ? '매도' : '매수'}';
+                      '\n개별 주식: ${result.individualAdjustment!.abs().toNumberFormat()}원 ${result.individualAdjustment! > 0 ? '매도' : '매수'}'
+                      '\n지수 주식: ${result.indexAdjustment!.abs().toNumberFormat()}원 ${result.indexAdjustment! > 0 ? '매도' : '매수'}';
                 }
                 // PortfolioBloc에 계산 결과 전달 (PortfolioItem 생성 후 add 이벤트 발행)
                 final portfolioItem = PortfolioItem.create(
-                  rebalanceAmount: result.overallAdjustment,
+                  rebalanceAmount: result.stockAdjustmentAmount,
+                  // TODO: 현금, 개별주식, 인덱스 등의 정보 추가
                   totalInvestment: state.totalInvestment.toDouble(),
                   currentStockValue: state.currentStockValue.toDouble(),
                 );
@@ -326,6 +334,10 @@ class _InvestmentInfoCardState extends State<InvestmentInfoCard> {
   late MoneyMaskedTextController currentStockValueController;
   late MoneyMaskedTextController currentBondValueController;
 
+  // 추가: 세부 설정 관련 컨트롤러들
+  late MoneyMaskedTextController totalIndexPurchaseController;
+  late MoneyMaskedTextController currentIndexValueController;
+
   @override
   void initState() {
     super.initState();
@@ -347,6 +359,18 @@ class _InvestmentInfoCardState extends State<InvestmentInfoCard> {
       precision: 0,
       initialValue: 0,
     );
+    totalIndexPurchaseController = MoneyMaskedTextController(
+      decimalSeparator: '',
+      thousandSeparator: ',',
+      precision: 0,
+      initialValue: 0,
+    );
+    currentIndexValueController = MoneyMaskedTextController(
+      decimalSeparator: '',
+      thousandSeparator: ',',
+      precision: 0,
+      initialValue: 0,
+    );
   }
 
   @override
@@ -354,6 +378,8 @@ class _InvestmentInfoCardState extends State<InvestmentInfoCard> {
     totalInvestmentController.dispose();
     currentStockValueController.dispose();
     currentBondValueController.dispose();
+    totalIndexPurchaseController.dispose();
+    currentIndexValueController.dispose();
     super.dispose();
   }
 
@@ -407,7 +433,7 @@ class _InvestmentInfoCardState extends State<InvestmentInfoCard> {
                   builder: (context, state) {
                     return Column(
                       children: [
-                        Text('세부 설정'),
+                        const Text('세부 설정'),
                         Switch(
                           value: state.isStockDetailOn,
                           onChanged: (_) {
@@ -420,6 +446,43 @@ class _InvestmentInfoCardState extends State<InvestmentInfoCard> {
                 ),
               ],
             ),
+            // 세부 설정이 켜지면 추가 입력 필드 표시
+            BlocBuilder<RebalancingBloc, RebalancingState>(
+              builder: (context, state) {
+                if (state.isStockDetailOn) {
+                  return Column(
+                    children: [
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: totalIndexPurchaseController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: '총 지수 주식 매수 금액',
+                        ),
+                        onChanged: (value) {
+                          bloc.add(TotalIndexPurchaseChanged(
+                              totalIndexPurchaseController.intValue));
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: currentIndexValueController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: '현재 지수 평가 금액',
+                        ),
+                        onChanged: (value) {
+                          bloc.add(CurrentIndexValueChanged(
+                              currentIndexValueController.intValue));
+                        },
+                      ),
+                    ],
+                  );
+                } else {
+                  return Container();
+                }
+              },
+            ),
             const SizedBox(height: 10),
             Row(
               children: [
@@ -431,7 +494,7 @@ class _InvestmentInfoCardState extends State<InvestmentInfoCard> {
                         controller: currentBondValueController,
                         keyboardType: TextInputType.number,
                         enabled: state.isBondEvaluationEnabled,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: '현재 채권 평가 금액',
                         ),
                         onChanged: (value) {
@@ -442,12 +505,12 @@ class _InvestmentInfoCardState extends State<InvestmentInfoCard> {
                     },
                   ),
                 ),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 BlocBuilder<RebalancingBloc, RebalancingState>(
                   builder: (context, state) {
                     return Column(
                       children: [
-                        Text('채권 사용'),
+                        const Text('채권 사용'),
                         Switch(
                           value: state.isBondEvaluationEnabled,
                           onChanged: (_) {
@@ -458,10 +521,9 @@ class _InvestmentInfoCardState extends State<InvestmentInfoCard> {
                     );
                   },
                 ),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
               ],
             ),
-            // TODO: 세부 설정이 켜지면 추가 입력 필드(총 지수 주식 매수 금액, 현재 지수 주식 평가 금액)도 표시하도록 구현
           ],
         ),
       ),
@@ -475,19 +537,19 @@ class RebalancingRatioCard extends StatelessWidget {
     final bloc = context.read<RebalancingBloc>();
     return Card(
       elevation: 4,
-      margin: EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: 8),
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: BlocBuilder<RebalancingBloc, RebalancingState>(
           builder: (context, state) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   '리벨런싱 비중 입력',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text('현금 비중 (%) : ${state.cashRatio.toString()}'),
                 Slider(
                   value: state.cashRatio.toDouble(),
@@ -499,7 +561,7 @@ class RebalancingRatioCard extends StatelessWidget {
                     bloc.add(CashRatioChanged(value.round()));
                   },
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text('주식 비중 (%) : ${state.stockRatio.toString()}'),
                 Slider(
                   value: state.stockRatio.toDouble(),
@@ -512,7 +574,7 @@ class RebalancingRatioCard extends StatelessWidget {
                   },
                 ),
                 if (state.isStockDetailOn) ...[
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Text(
                       '개별 주식 비중 (%) : ${state.individualStockRatio.toString()}'),
                   Slider(
@@ -537,7 +599,7 @@ class RebalancingRatioCard extends StatelessWidget {
                     },
                   ),
                 ],
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 if (state.isBondEvaluationEnabled) ...[
                   Text('채권 비중 (%) : ${state.bondRatio.toString()}'),
                   Slider(

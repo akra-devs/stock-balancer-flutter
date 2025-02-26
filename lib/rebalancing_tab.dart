@@ -15,8 +15,8 @@ class RebalanceResult {
   final double cashAdjustmentAmount;
   final double stockAdjustmentAmount;
   final double bondAdjustmentAmount;
-  final double individualAdjustment;
-  final double indexAdjustment;
+  final double? individualAdjustment;
+  final double? indexAdjustment;
 
   RebalanceResult({
     required this.cashAdjustmentAmount,
@@ -49,17 +49,28 @@ RebalanceResult calculateRebalance(RebalancingState state) {
       "pastCashAmount: $pastCashAmount, afterCashAmount: $afterCashAmount , rebalanceCashAmount: $rebalanceCashAmount");
 
   // 게산 주식 변수
-  double pastStockAmount = totalInvestment * stockRatio;
+  double pastStockAmount = totalInvestment;
   double afterStockAmount = (pastCashAmount + currentStockValue) * stockRatio;
   double rebalanceStockAmount = afterStockAmount - pastStockAmount;
-
   print(
       "pastStockAmount: $pastStockAmount, afterStockAmount: $afterStockAmount , rebalanceStockAmount: $rebalanceStockAmount");
+
+  //====== 세부 설정 시 계산
+  double pastIndividualStockAmount = totalInvestment * individualStockRatio;
+  double pastIndexStockAmount = totalInvestment * indexStockRatio;
+
+  double afterIndividualStockAmount = afterStockAmount * individualStockRatio;
+  double afterIndexStockAmount = afterStockAmount * individualStockRatio;
+
+  final double individualAdjustment =
+      (afterStockAmount - totalInvestment) * individualStockRatio;
+  final double indexAdjustment =
+      (afterStockAmount - totalInvestment) * indexStockRatio;
+
   // 계산 채권 변수
   double pastBondAmount = totalInvestment * bondRatio;
   double afterBondAmount = (pastCashAmount + currentStockValue) * bondRatio;
   double rebalanceBondAmount = afterBondAmount - pastBondAmount;
-
   print(
       "pastBondAmount: $pastBondAmount, afterBondAmount: $afterBondAmount , rebalanceBondAmount: $rebalanceBondAmount");
 
@@ -67,9 +78,8 @@ RebalanceResult calculateRebalance(RebalancingState state) {
     cashAdjustmentAmount: rebalanceCashAmount,
     stockAdjustmentAmount: rebalanceStockAmount,
     bondAdjustmentAmount: rebalanceBondAmount,
-    individualAdjustment: 0,
-    // TODO: 구현 필요
-    indexAdjustment: 0,
+    individualAdjustment: state.isStockDetailOn ? individualAdjustment : null,
+    indexAdjustment: state.isStockDetailOn ? indexAdjustment : null,
   );
 }
 
@@ -150,6 +160,7 @@ class RebalancingState with _$RebalancingState {
     @Default(0) int totalInvestment,
     @Default(0) int currentStockValue,
     @Default(0) int currentBondValue,
+    @Default(0) int currentIndexValue, // 추가: 현재 지수 평가 금액
     @Default(0) int cashRatio,
     @Default(0) int stockRatio,
     @Default(0) int bondRatio,
@@ -157,8 +168,6 @@ class RebalancingState with _$RebalancingState {
     @Default(0) int indexStockRatio,
     @Default(false) bool isStockDetailOn,
     @Default(false) bool isBondEvaluationEnabled,
-    @Default(0) int totalIndexPurchase, // 추가: 총 지수 주식 매수 금액
-    @Default(0) int currentIndexValue, // 추가: 현재 지수 평가 금액
   }) = _RebalancingState;
 }
 

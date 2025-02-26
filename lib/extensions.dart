@@ -17,3 +17,12 @@ extension NumberFormatting on num {
     return (this.toDouble()) / 100;
   }
 }
+
+extension LetExtension<T> on T? {
+  R? let<R>(R Function(T value) op) {
+    if (this != null) {
+      return op(this!);
+    }
+    return null;
+  }
+}

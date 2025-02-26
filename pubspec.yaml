@@ -37,6 +37,8 @@ dependencies:
   intl: ^0.18.1
   uuid: ^3.0.6
   flutter_masked_text2: ^0.9.1
+  sqflite: ^2.2.5
+  path: ^1.8.3
 
 
 

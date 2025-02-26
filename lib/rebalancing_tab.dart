@@ -32,36 +32,36 @@ RebalanceResult calculateRebalance(RebalancingState state) {
   double totalInvestment = state.totalInvestment.toDouble();
   double currentStockValue = state.currentStockValue.toDouble();
   double currentBondValue = state.currentBondValue.toDouble();
-  double cashRatio = state.cashRatio.toDouble();
-  double stockRatio = state.stockRatio.toDouble();
-  double bondRatio = state.bondRatio.toDouble();
-  double individualStockRatio = state.individualStockRatio.toDouble();
-  double indexStockRatio = state.indexStockRatio.toDouble();
-  double currentIndexValue = state.currentIndexValue.toDouble();
+  double cashRatio = state.cashRatio.toRatioFormat();
+  double stockRatio = state.stockRatio.toRatioFormat();
+  double bondRatio = state.bondRatio.toRatioFormat();
+  double individualStockRatio = state.individualStockRatio.toRatioFormat();
+  double indexStockRatio = state.indexStockRatio.toRatioFormat();
+  double currentIndexValue = state.currentIndexValue.toRatioFormat();
 
   // 계산 현금 변수
   double pastCashAmount =
       totalInvestment * (((cashRatio + bondRatio)) / stockRatio);
-  double afterCashAmount = ((pastCashAmount + currentStockValue) * cashRatio);
+  double afterCashAmount = ((pastCashAmount + currentStockValue)) * cashRatio;
   double rebalanceCashAmount = afterCashAmount - pastCashAmount;
+
+  print(
+      "pastCashAmount: $pastCashAmount, afterCashAmount: $afterCashAmount , rebalanceCashAmount: $rebalanceCashAmount");
 
   // 게산 주식 변수
   double pastStockAmount = totalInvestment * stockRatio;
   double afterStockAmount = (pastCashAmount + currentStockValue) * stockRatio;
   double rebalanceStockAmount = afterStockAmount - pastStockAmount;
 
+  print(
+      "pastStockAmount: $pastStockAmount, afterStockAmount: $afterStockAmount , rebalanceStockAmount: $rebalanceStockAmount");
   // 계산 채권 변수
   double pastBondAmount = totalInvestment * bondRatio;
   double afterBondAmount = (pastCashAmount + currentStockValue) * bondRatio;
   double rebalanceBondAmount = afterBondAmount - pastBondAmount;
 
-  // var result = switch (state.isStockDetailOn) {
-  //   false => (() {
-  //       var temp = totalInvestment.toInt();
-  //       return totalInvestment * 2;
-  //     })(),
-  //   true => {},
-  // };
+  print(
+      "pastBondAmount: $pastBondAmount, afterBondAmount: $afterBondAmount , rebalanceBondAmount: $rebalanceBondAmount");
 
   return RebalanceResult(
     cashAdjustmentAmount: rebalanceCashAmount,

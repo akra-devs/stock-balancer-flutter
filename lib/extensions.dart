@@ -12,4 +12,8 @@ extension NumberFormatting on num {
   String toNumberFormat() {
     return numberFormatter.format(this.toInt());
   }
+
+  double toRatioFormat() {
+    return (this.toDouble()) / 100;
+  }
 }

@@ -234,8 +234,11 @@ class RebalancingBloc extends Bloc<RebalancingEvent, RebalancingState> {
       emit(state.copyWith(isStockDetailOn: !state.isStockDetailOn));
     });
     on<ToggleBondEvaluation>((event, emit) {
+      int bondRatio = state.isBondEvaluationEnabled ? 0 : state.bondRatio;
       emit(state.copyWith(
-          isBondEvaluationEnabled: !state.isBondEvaluationEnabled));
+        isBondEvaluationEnabled: !state.isBondEvaluationEnabled,
+        bondRatio: bondRatio,
+      ));
     });
     on<TotalIndexPurchaseChanged>((event, emit) {
       emit(state.copyWith(totalIndexPurchase: event.totalIndexPurchase));
@@ -285,6 +288,13 @@ class RebalancingHomePage extends StatelessWidget {
                 if (state.cashRatio >= 100) {
                   ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('현금비중이 100% 이상일 수 없습니다.')));
+                  return;
+                }
+                var totalRatio =
+                    state.stockRatio + state.cashRatio + state.bondRatio;
+                if (totalRatio != 100) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('총 비중이 100% 이어야 합니다.')));
                   return;
                 }
                 RebalanceResult result = calculateRebalance(state);
@@ -571,7 +581,7 @@ class RebalancingRatioCard extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 10),
-                Text('주식 비중 (%) : ${state.stockRatio.toString()}'),
+                Text('총 주식 비중 (%) : ${state.stockRatio.toString()}'),
                 Slider(
                   value: state.stockRatio.toDouble(),
                   min: 0,

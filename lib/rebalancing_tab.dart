@@ -418,28 +418,37 @@ class _InvestmentInfoCardState extends State<InvestmentInfoCard> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            // 총 매수 원금 금액 입력
+            // 총 매수 원금 금액 입력 (Tooltip 사용)
             TextField(
               controller: totalInvestmentController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: '총 매수 원금 금액',
+                suffixIcon: Tooltip(
+                  message: '총 매수 원금 = 주식+채권 전체 매수 당시 금액',
+                  child: Icon(Icons.help_outline, size: 16),
+                ),
               ),
               onChanged: (value) {
                 bloc.add(
-                    TotalInvestmentChanged(totalInvestmentController.intValue));
+                  TotalInvestmentChanged(totalInvestmentController.intValue),
+                );
               },
             ),
             const SizedBox(height: 10),
             Row(
               children: [
                 Expanded(
-                  // 현재 주식 평가 금액 입력
+                  // 현재 주식 평가 금액 입력 (Tooltip 사용)
                   child: TextField(
                     controller: currentStockValueController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: '현재 주식 평가 금액',
+                      suffixIcon: Tooltip(
+                        message: '아직 미정인 내용',
+                        child: Icon(Icons.help_outline, size: 16),
+                      ),
                     ),
                     onChanged: (value) {
                       bloc.add(CurrentStockValueChanged(
@@ -471,18 +480,6 @@ class _InvestmentInfoCardState extends State<InvestmentInfoCard> {
                 if (state.isStockDetailOn) {
                   return Column(
                     children: [
-                      // const SizedBox(height: 10),
-                      // TextField(
-                      //   controller: totalIndexPurchaseController,
-                      //   keyboardType: TextInputType.number,
-                      //   decoration: const InputDecoration(
-                      //     labelText: '총 지수 주식 매수 금액',
-                      //   ),
-                      //   onChanged: (value) {
-                      //     bloc.add(TotalIndexPurchaseChanged(
-                      //         totalIndexPurchaseController.intValue));
-                      //   },
-                      // ),
                       const SizedBox(height: 10),
                       TextField(
                         controller: currentIndexValueController,

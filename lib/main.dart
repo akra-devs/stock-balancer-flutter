@@ -20,7 +20,7 @@ class RebalancingApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: '리벨런싱 앱',
+        title: '리벨런싱 계산기',
         theme: ThemeData(
           primarySwatch: Colors.blue,
           brightness: Brightness.light,

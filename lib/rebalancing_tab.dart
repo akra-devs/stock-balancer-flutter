@@ -461,18 +461,18 @@ class _InvestmentInfoCardState extends State<InvestmentInfoCard> {
                 if (state.isStockDetailOn) {
                   return Column(
                     children: [
-                      const SizedBox(height: 10),
-                      TextField(
-                        controller: totalIndexPurchaseController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: '총 지수 주식 매수 금액',
-                        ),
-                        onChanged: (value) {
-                          bloc.add(TotalIndexPurchaseChanged(
-                              totalIndexPurchaseController.intValue));
-                        },
-                      ),
+                      // const SizedBox(height: 10),
+                      // TextField(
+                      //   controller: totalIndexPurchaseController,
+                      //   keyboardType: TextInputType.number,
+                      //   decoration: const InputDecoration(
+                      //     labelText: '총 지수 주식 매수 금액',
+                      //   ),
+                      //   onChanged: (value) {
+                      //     bloc.add(TotalIndexPurchaseChanged(
+                      //         totalIndexPurchaseController.intValue));
+                      //   },
+                      // ),
                       const SizedBox(height: 10),
                       TextField(
                         controller: currentIndexValueController,

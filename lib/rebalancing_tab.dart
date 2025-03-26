@@ -261,10 +261,16 @@ class RebalancingHomePage extends StatelessWidget {
                 }
                 // PortfolioBloc에 계산 결과 전달 (PortfolioItem 생성 후 add 이벤트 발행)
                 final portfolioItem = PortfolioItem.create(
-                  rebalanceAmount: result.stockAdjustmentAmount,
-                  // TODO: 현금, 개별주식, 인덱스 등의 정보 추가
                   totalInvestment: state.totalInvestment.toDouble(),
-                  currentStockValue: state.currentStockValue.toDouble(),
+                  beforeCashValue: state.currentCashValue.toDouble(),
+                  beforeStockValue: state.currentStockValue.toDouble(),
+                  beforeBondValue: state.isBondEvaluationEnabled
+                      ? state.currentBondValue.toDouble()
+                      : null,
+                  beforeIndexValue: state.isStockDetailOn
+                      ? state.currentIndexValue.toDouble()
+                      : null,
+                  result: result,
                 );
                 context
                     .read<PortfolioBloc>()

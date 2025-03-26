@@ -14,24 +14,32 @@ class PortfolioItem with _$PortfolioItem {
   factory PortfolioItem({
     required String id,
     required DateTime savedAt,
-    required double rebalanceAmount,
     required double totalInvestment,
-    required double currentStockValue,
+    required double beforeCashValue,
+    required double beforeStockValue,
+    required double? beforeBondValue,
+    required double? beforeIndexValue,
     required RebalanceResult result,
   }) = _PortfolioItem;
 
   factory PortfolioItem.create({
-    required double rebalanceAmount,
     required double totalInvestment,
-    required double currentStockValue,
+    required double beforeCashValue,
+    required double beforeStockValue,
+    required double? beforeBondValue,
+    required double? beforeIndexValue,
+    required RebalanceResult result,
   }) {
     final String generatedId = const Uuid().v4();
     return PortfolioItem(
       id: generatedId,
       savedAt: DateTime.now(),
-      rebalanceAmount: rebalanceAmount,
       totalInvestment: totalInvestment,
-      currentStockValue: currentStockValue,
+      beforeCashValue: beforeCashValue,
+      beforeStockValue: beforeStockValue,
+      beforeBondValue: beforeBondValue,
+      beforeIndexValue: beforeIndexValue,
+      result: result,
     );
   }
 }

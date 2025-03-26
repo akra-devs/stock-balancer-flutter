@@ -18,9 +18,12 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$PortfolioItem {
   String get id => throw _privateConstructorUsedError;
   DateTime get savedAt => throw _privateConstructorUsedError;
-  double get rebalanceAmount => throw _privateConstructorUsedError;
   double get totalInvestment => throw _privateConstructorUsedError;
-  double get currentStockValue => throw _privateConstructorUsedError;
+  double get beforeCashValue => throw _privateConstructorUsedError;
+  double get beforeStockValue => throw _privateConstructorUsedError;
+  double? get beforeBondValue => throw _privateConstructorUsedError;
+  double? get beforeIndexValue => throw _privateConstructorUsedError;
+  RebalanceResult get result => throw _privateConstructorUsedError;
 
   /// Create a copy of PortfolioItem
   /// with the given fields replaced by the non-null parameter values.
@@ -38,9 +41,12 @@ abstract class $PortfolioItemCopyWith<$Res> {
   $Res call(
       {String id,
       DateTime savedAt,
-      double rebalanceAmount,
       double totalInvestment,
-      double currentStockValue});
+      double beforeCashValue,
+      double beforeStockValue,
+      double? beforeBondValue,
+      double? beforeIndexValue,
+      RebalanceResult result});
 }
 
 /// @nodoc
@@ -60,9 +66,12 @@ class _$PortfolioItemCopyWithImpl<$Res, $Val extends PortfolioItem>
   $Res call({
     Object? id = null,
     Object? savedAt = null,
-    Object? rebalanceAmount = null,
     Object? totalInvestment = null,
-    Object? currentStockValue = null,
+    Object? beforeCashValue = null,
+    Object? beforeStockValue = null,
+    Object? beforeBondValue = freezed,
+    Object? beforeIndexValue = freezed,
+    Object? result = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -73,18 +82,30 @@ class _$PortfolioItemCopyWithImpl<$Res, $Val extends PortfolioItem>
           ? _value.savedAt
           : savedAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      rebalanceAmount: null == rebalanceAmount
-          ? _value.rebalanceAmount
-          : rebalanceAmount // ignore: cast_nullable_to_non_nullable
-              as double,
       totalInvestment: null == totalInvestment
           ? _value.totalInvestment
           : totalInvestment // ignore: cast_nullable_to_non_nullable
               as double,
-      currentStockValue: null == currentStockValue
-          ? _value.currentStockValue
-          : currentStockValue // ignore: cast_nullable_to_non_nullable
+      beforeCashValue: null == beforeCashValue
+          ? _value.beforeCashValue
+          : beforeCashValue // ignore: cast_nullable_to_non_nullable
               as double,
+      beforeStockValue: null == beforeStockValue
+          ? _value.beforeStockValue
+          : beforeStockValue // ignore: cast_nullable_to_non_nullable
+              as double,
+      beforeBondValue: freezed == beforeBondValue
+          ? _value.beforeBondValue
+          : beforeBondValue // ignore: cast_nullable_to_non_nullable
+              as double?,
+      beforeIndexValue: freezed == beforeIndexValue
+          ? _value.beforeIndexValue
+          : beforeIndexValue // ignore: cast_nullable_to_non_nullable
+              as double?,
+      result: null == result
+          ? _value.result
+          : result // ignore: cast_nullable_to_non_nullable
+              as RebalanceResult,
     ) as $Val);
   }
 }
@@ -100,9 +121,12 @@ abstract class _$$PortfolioItemImplCopyWith<$Res>
   $Res call(
       {String id,
       DateTime savedAt,
-      double rebalanceAmount,
       double totalInvestment,
-      double currentStockValue});
+      double beforeCashValue,
+      double beforeStockValue,
+      double? beforeBondValue,
+      double? beforeIndexValue,
+      RebalanceResult result});
 }
 
 /// @nodoc
@@ -120,9 +144,12 @@ class __$$PortfolioItemImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? savedAt = null,
-    Object? rebalanceAmount = null,
     Object? totalInvestment = null,
-    Object? currentStockValue = null,
+    Object? beforeCashValue = null,
+    Object? beforeStockValue = null,
+    Object? beforeBondValue = freezed,
+    Object? beforeIndexValue = freezed,
+    Object? result = null,
   }) {
     return _then(_$PortfolioItemImpl(
       id: null == id
@@ -133,18 +160,30 @@ class __$$PortfolioItemImplCopyWithImpl<$Res>
           ? _value.savedAt
           : savedAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      rebalanceAmount: null == rebalanceAmount
-          ? _value.rebalanceAmount
-          : rebalanceAmount // ignore: cast_nullable_to_non_nullable
-              as double,
       totalInvestment: null == totalInvestment
           ? _value.totalInvestment
           : totalInvestment // ignore: cast_nullable_to_non_nullable
               as double,
-      currentStockValue: null == currentStockValue
-          ? _value.currentStockValue
-          : currentStockValue // ignore: cast_nullable_to_non_nullable
+      beforeCashValue: null == beforeCashValue
+          ? _value.beforeCashValue
+          : beforeCashValue // ignore: cast_nullable_to_non_nullable
               as double,
+      beforeStockValue: null == beforeStockValue
+          ? _value.beforeStockValue
+          : beforeStockValue // ignore: cast_nullable_to_non_nullable
+              as double,
+      beforeBondValue: freezed == beforeBondValue
+          ? _value.beforeBondValue
+          : beforeBondValue // ignore: cast_nullable_to_non_nullable
+              as double?,
+      beforeIndexValue: freezed == beforeIndexValue
+          ? _value.beforeIndexValue
+          : beforeIndexValue // ignore: cast_nullable_to_non_nullable
+              as double?,
+      result: null == result
+          ? _value.result
+          : result // ignore: cast_nullable_to_non_nullable
+              as RebalanceResult,
     ));
   }
 }
@@ -155,24 +194,33 @@ class _$PortfolioItemImpl implements _PortfolioItem {
   _$PortfolioItemImpl(
       {required this.id,
       required this.savedAt,
-      required this.rebalanceAmount,
       required this.totalInvestment,
-      required this.currentStockValue});
+      required this.beforeCashValue,
+      required this.beforeStockValue,
+      required this.beforeBondValue,
+      required this.beforeIndexValue,
+      required this.result});
 
   @override
   final String id;
   @override
   final DateTime savedAt;
   @override
-  final double rebalanceAmount;
-  @override
   final double totalInvestment;
   @override
-  final double currentStockValue;
+  final double beforeCashValue;
+  @override
+  final double beforeStockValue;
+  @override
+  final double? beforeBondValue;
+  @override
+  final double? beforeIndexValue;
+  @override
+  final RebalanceResult result;
 
   @override
   String toString() {
-    return 'PortfolioItem(id: $id, savedAt: $savedAt, rebalanceAmount: $rebalanceAmount, totalInvestment: $totalInvestment, currentStockValue: $currentStockValue)';
+    return 'PortfolioItem(id: $id, savedAt: $savedAt, totalInvestment: $totalInvestment, beforeCashValue: $beforeCashValue, beforeStockValue: $beforeStockValue, beforeBondValue: $beforeBondValue, beforeIndexValue: $beforeIndexValue, result: $result)';
   }
 
   @override
@@ -182,17 +230,30 @@ class _$PortfolioItemImpl implements _PortfolioItem {
             other is _$PortfolioItemImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.savedAt, savedAt) || other.savedAt == savedAt) &&
-            (identical(other.rebalanceAmount, rebalanceAmount) ||
-                other.rebalanceAmount == rebalanceAmount) &&
             (identical(other.totalInvestment, totalInvestment) ||
                 other.totalInvestment == totalInvestment) &&
-            (identical(other.currentStockValue, currentStockValue) ||
-                other.currentStockValue == currentStockValue));
+            (identical(other.beforeCashValue, beforeCashValue) ||
+                other.beforeCashValue == beforeCashValue) &&
+            (identical(other.beforeStockValue, beforeStockValue) ||
+                other.beforeStockValue == beforeStockValue) &&
+            (identical(other.beforeBondValue, beforeBondValue) ||
+                other.beforeBondValue == beforeBondValue) &&
+            (identical(other.beforeIndexValue, beforeIndexValue) ||
+                other.beforeIndexValue == beforeIndexValue) &&
+            (identical(other.result, result) || other.result == result));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, savedAt, rebalanceAmount,
-      totalInvestment, currentStockValue);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      savedAt,
+      totalInvestment,
+      beforeCashValue,
+      beforeStockValue,
+      beforeBondValue,
+      beforeIndexValue,
+      result);
 
   /// Create a copy of PortfolioItem
   /// with the given fields replaced by the non-null parameter values.
@@ -207,20 +268,29 @@ abstract class _PortfolioItem implements PortfolioItem {
   factory _PortfolioItem(
       {required final String id,
       required final DateTime savedAt,
-      required final double rebalanceAmount,
       required final double totalInvestment,
-      required final double currentStockValue}) = _$PortfolioItemImpl;
+      required final double beforeCashValue,
+      required final double beforeStockValue,
+      required final double? beforeBondValue,
+      required final double? beforeIndexValue,
+      required final RebalanceResult result}) = _$PortfolioItemImpl;
 
   @override
   String get id;
   @override
   DateTime get savedAt;
   @override
-  double get rebalanceAmount;
-  @override
   double get totalInvestment;
   @override
-  double get currentStockValue;
+  double get beforeCashValue;
+  @override
+  double get beforeStockValue;
+  @override
+  double? get beforeBondValue;
+  @override
+  double? get beforeIndexValue;
+  @override
+  RebalanceResult get result;
 
   /// Create a copy of PortfolioItem
   /// with the given fields replaced by the non-null parameter values.

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
 import 'package:stock_rebalance/extensions.dart';
+import 'package:stock_rebalance/rebalancing_tab.dart';
 import 'package:stock_rebalance/repository/PortfolioRepository.dart';
 import 'package:uuid/uuid.dart';
 
@@ -16,6 +17,7 @@ class PortfolioItem with _$PortfolioItem {
     required double rebalanceAmount,
     required double totalInvestment,
     required double currentStockValue,
+    required RebalanceResult result,
   }) = _PortfolioItem;
 
   factory PortfolioItem.create({

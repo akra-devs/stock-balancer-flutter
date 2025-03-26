@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:stock_rebalance/extensions.dart';
-import 'package:stock_rebalance/portfolio_tab.dart'; // 예: int.toNumberFormat() 확장 함수
+import 'package:stock_rebalance/portfolio_tab.dart';
+import 'package:stock_rebalance/service/RebalancingService.dart'; // 예: int.toNumberFormat() 확장 함수
 
 part 'rebalancing_tab.freezed.dart';
 
@@ -14,7 +15,7 @@ part 'rebalancing_tab.freezed.dart';
 class RebalanceResult {
   final double cashAdjustmentAmount;
   final double stockAdjustmentAmount;
-  final double bondAdjustmentAmount;
+  final double? bondAdjustmentAmount;
   final double? individualAdjustment;
   final double? indexAdjustment;
 
@@ -25,63 +26,6 @@ class RebalanceResult {
     required this.individualAdjustment,
     required this.indexAdjustment,
   });
-}
-
-/// 리벨런싱 계산 로직을 분리한 함수
-RebalanceResult calculateRebalance(RebalancingState state) {
-  double totalInvestment = state.totalInvestment.toDouble();
-  double currentStockValue = state.currentStockValue.toDouble();
-  double currentBondValue = state.currentBondValue.toDouble();
-  double cashRatio = state.cashRatio.toRatioFormat();
-  double stockRatio = state.stockRatio.toRatioFormat();
-  double bondRatio = state.bondRatio.toRatioFormat();
-  double individualStockRatio = state.individualStockRatio.toRatioFormat();
-  double indexStockRatio = state.indexStockRatio.toRatioFormat();
-  double currentIndexValue = state.currentIndexValue.toRatioFormat();
-
-  // 계산 현금 변수
-  double pastCashAmount =
-      totalInvestment * (((cashRatio + bondRatio)) / stockRatio);
-  double afterCashAmount = ((pastCashAmount + currentStockValue)) * cashRatio;
-  double rebalanceCashAmount = afterCashAmount - pastCashAmount;
-
-  print(
-      "pastCashAmount: $pastCashAmount, afterCashAmount: $afterCashAmount , rebalanceCashAmount: $rebalanceCashAmount");
-
-  // 게산 주식 변수
-  double pastStockAmount =
-      totalInvestment * (stockRatio / (stockRatio + bondRatio));
-  double afterStockAmount = (pastCashAmount + currentStockValue) * stockRatio;
-  double rebalanceStockAmount = afterStockAmount - pastStockAmount;
-  print(
-      "pastStockAmount: $pastStockAmount, afterStockAmount: $afterStockAmount , rebalanceStockAmount: $rebalanceStockAmount");
-
-  //====== 세부 설정 시 계산
-  double pastIndividualStockAmount = totalInvestment * individualStockRatio;
-  double pastIndexStockAmount = totalInvestment * indexStockRatio;
-
-  double afterIndividualStockAmount = afterStockAmount * individualStockRatio;
-  double afterIndexStockAmount = afterStockAmount * individualStockRatio;
-
-  final double individualAdjustment =
-      (afterStockAmount - totalInvestment) * individualStockRatio;
-  final double indexAdjustment =
-      (afterStockAmount - totalInvestment) * indexStockRatio;
-
-  // 계산 채권 변수
-  double pastBondAmount = totalInvestment * bondRatio;
-  double afterBondAmount = (pastCashAmount + currentStockValue) * bondRatio;
-  double rebalanceBondAmount = afterBondAmount - pastBondAmount;
-  print(
-      "pastBondAmount: $pastBondAmount, afterBondAmount: $afterBondAmount , rebalanceBondAmount: $rebalanceBondAmount");
-
-  return RebalanceResult(
-    cashAdjustmentAmount: rebalanceCashAmount,
-    stockAdjustmentAmount: rebalanceStockAmount,
-    bondAdjustmentAmount: rebalanceBondAmount,
-    individualAdjustment: state.isStockDetailOn ? individualAdjustment : null,
-    indexAdjustment: state.isStockDetailOn ? indexAdjustment : null,
-  );
 }
 
 ///────────────────────────────
@@ -302,14 +246,18 @@ class RebalancingHomePage extends StatelessWidget {
                 }
                 RebalanceResult result = calculateRebalance(state);
                 String overallText =
-                    '전체 리벨런싱 결과: 주식을 ${result.stockAdjustmentAmount.abs().toNumberFormat()}원 만큼 ${result.stockAdjustmentAmount > 0 ? '매도' : '매수'} 하세요.';
-                // TODO: 개별 주식 & 인덱스 주식 정보 필요
+                    '전체 리벨런싱 결과: 주식을 ${result.stockAdjustmentAmount.abs().toNumberFormat()}원 만큼 ${result.stockAdjustmentAmount > 0 ? '매수' : '매도'} 하세요.';
                 String detailText = '';
                 if (result.individualAdjustment != null &&
                     result.indexAdjustment != null) {
                   detailText =
-                      '\n개별 주식: ${result.individualAdjustment!.abs().toNumberFormat()}원 ${result.individualAdjustment! > 0 ? '매도' : '매수'}'
-                      '\n지수 주식: ${result.indexAdjustment!.abs().toNumberFormat()}원 ${result.indexAdjustment! > 0 ? '매도' : '매수'}';
+                      '\n개별 주식: ${result.individualAdjustment!.abs().toNumberFormat()}원 ${result.individualAdjustment! > 0 ? '매수' : '매도'}'
+                      '\n지수 주식: ${result.indexAdjustment!.abs().toNumberFormat()}원 ${result.indexAdjustment! > 0 ? '매수' : '매도'}';
+                }
+                String bondResult = '';
+                if (result.bondAdjustmentAmount != null) {
+                  bondResult =
+                      '\n채권: ${result.bondAdjustmentAmount!.abs().toNumberFormat()}원 ${result.bondAdjustmentAmount! > 0 ? '매수' : '매도'}';
                 }
                 // PortfolioBloc에 계산 결과 전달 (PortfolioItem 생성 후 add 이벤트 발행)
                 final portfolioItem = PortfolioItem.create(
@@ -325,7 +273,7 @@ class RebalancingHomePage extends StatelessWidget {
                   context: context,
                   builder: (context) => AlertDialog(
                     title: Text('리벨런싱 결과'),
-                    content: Text(overallText + detailText),
+                    content: Text(overallText + detailText + bondResult),
                     actions: [
                       TextButton(
                         onPressed: () {
@@ -474,7 +422,7 @@ class _InvestmentInfoCardState extends State<InvestmentInfoCard> {
                     decoration: InputDecoration(
                       labelText: '현재 주식 평가 금액',
                       suffixIcon: Tooltip(
-                        message: '아직 미정인 내용',
+                        message: '개별 주식 + 지수 주식 총 합계',
                         child: Icon(Icons.help_outline, size: 16),
                       ),
                     ),

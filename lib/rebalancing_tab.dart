@@ -49,7 +49,8 @@ RebalanceResult calculateRebalance(RebalancingState state) {
       "pastCashAmount: $pastCashAmount, afterCashAmount: $afterCashAmount , rebalanceCashAmount: $rebalanceCashAmount");
 
   // 게산 주식 변수
-  double pastStockAmount = totalInvestment;
+  double pastStockAmount =
+      totalInvestment * (stockRatio / (stockRatio + bondRatio));
   double afterStockAmount = (pastCashAmount + currentStockValue) * stockRatio;
   double rebalanceStockAmount = afterStockAmount - pastStockAmount;
   print(
@@ -93,6 +94,12 @@ class TotalInvestmentChanged extends RebalancingEvent {
   final int totalInvestment;
 
   TotalInvestmentChanged(this.totalInvestment);
+}
+
+class CurrentCashValueChanged extends RebalancingEvent {
+  final int currentCashValue;
+
+  CurrentCashValueChanged(this.currentCashValue);
 }
 
 class CurrentStockValueChanged extends RebalancingEvent {
@@ -152,6 +159,7 @@ class CurrentIndexValueChanged extends RebalancingEvent {
 class RebalancingState with _$RebalancingState {
   factory RebalancingState({
     @Default(0) int totalInvestment,
+    @Default(0) int currentCashValue,
     @Default(0) int currentStockValue,
     @Default(0) int currentBondValue,
     @Default(0) int currentIndexValue, // 추가: 현재 지수 평가 금액
@@ -169,6 +177,9 @@ class RebalancingBloc extends Bloc<RebalancingEvent, RebalancingState> {
   RebalancingBloc() : super(RebalancingState()) {
     on<TotalInvestmentChanged>((event, emit) {
       emit(state.copyWith(totalInvestment: event.totalInvestment));
+    });
+    on<CurrentCashValueChanged>((event, emit) {
+      emit(state.copyWith(currentCashValue: event.currentCashValue));
     });
     on<CurrentStockValueChanged>((event, emit) {
       emit(state.copyWith(currentStockValue: event.currentStockValue));
@@ -342,6 +353,7 @@ class InvestmentInfoCard extends StatefulWidget {
 
 class _InvestmentInfoCardState extends State<InvestmentInfoCard> {
   late MoneyMaskedTextController totalInvestmentController;
+  late MoneyMaskedTextController currentCashValueController;
   late MoneyMaskedTextController currentStockValueController;
   late MoneyMaskedTextController currentBondValueController;
 
@@ -353,6 +365,12 @@ class _InvestmentInfoCardState extends State<InvestmentInfoCard> {
   void initState() {
     super.initState();
     totalInvestmentController = MoneyMaskedTextController(
+      decimalSeparator: '',
+      thousandSeparator: ',',
+      precision: 0,
+      initialValue: 0,
+    );
+    currentCashValueController = MoneyMaskedTextController(
       decimalSeparator: '',
       thousandSeparator: ',',
       precision: 0,
@@ -387,6 +405,7 @@ class _InvestmentInfoCardState extends State<InvestmentInfoCard> {
   @override
   void dispose() {
     totalInvestmentController.dispose();
+    currentCashValueController.dispose();
     currentStockValueController.dispose();
     currentBondValueController.dispose();
     totalIndexPurchaseController.dispose();
@@ -425,6 +444,23 @@ class _InvestmentInfoCardState extends State<InvestmentInfoCard> {
                 bloc.add(
                   TotalInvestmentChanged(totalInvestmentController.intValue),
                 );
+              },
+            ),
+            const SizedBox(height: 10),
+            // 현재 보유 현금 (Tooltip 사용)
+            TextField(
+              controller: currentCashValueController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: '보유 현금액',
+                suffixIcon: Tooltip(
+                  message: '투자에 가능한 여유 현금 보유량',
+                  child: Icon(Icons.help_outline, size: 16),
+                ),
+              ),
+              onChanged: (value) {
+                bloc.add(CurrentCashValueChanged(
+                    currentCashValueController.intValue));
               },
             ),
             const SizedBox(height: 10),
@@ -570,7 +606,7 @@ class RebalancingRatioCard extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 10),
-                Text('총 주식 비중 (%) : ${state.stockRatio.toString()}'),
+                Text('주식 비중 (%) : ${state.stockRatio.toString()}'),
                 Slider(
                   value: state.stockRatio.toDouble(),
                   min: 0,

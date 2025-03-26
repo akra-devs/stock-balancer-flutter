@@ -17,6 +17,7 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$RebalancingState {
   int get totalInvestment => throw _privateConstructorUsedError;
+  int get currentCashValue => throw _privateConstructorUsedError;
   int get currentStockValue => throw _privateConstructorUsedError;
   int get currentBondValue => throw _privateConstructorUsedError;
   int get currentIndexValue =>
@@ -44,6 +45,7 @@ abstract class $RebalancingStateCopyWith<$Res> {
   @useResult
   $Res call(
       {int totalInvestment,
+      int currentCashValue,
       int currentStockValue,
       int currentBondValue,
       int currentIndexValue,
@@ -72,6 +74,7 @@ class _$RebalancingStateCopyWithImpl<$Res, $Val extends RebalancingState>
   @override
   $Res call({
     Object? totalInvestment = null,
+    Object? currentCashValue = null,
     Object? currentStockValue = null,
     Object? currentBondValue = null,
     Object? currentIndexValue = null,
@@ -87,6 +90,10 @@ class _$RebalancingStateCopyWithImpl<$Res, $Val extends RebalancingState>
       totalInvestment: null == totalInvestment
           ? _value.totalInvestment
           : totalInvestment // ignore: cast_nullable_to_non_nullable
+              as int,
+      currentCashValue: null == currentCashValue
+          ? _value.currentCashValue
+          : currentCashValue // ignore: cast_nullable_to_non_nullable
               as int,
       currentStockValue: null == currentStockValue
           ? _value.currentStockValue
@@ -142,6 +149,7 @@ abstract class _$$RebalancingStateImplCopyWith<$Res>
   @useResult
   $Res call(
       {int totalInvestment,
+      int currentCashValue,
       int currentStockValue,
       int currentBondValue,
       int currentIndexValue,
@@ -168,6 +176,7 @@ class __$$RebalancingStateImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? totalInvestment = null,
+    Object? currentCashValue = null,
     Object? currentStockValue = null,
     Object? currentBondValue = null,
     Object? currentIndexValue = null,
@@ -183,6 +192,10 @@ class __$$RebalancingStateImplCopyWithImpl<$Res>
       totalInvestment: null == totalInvestment
           ? _value.totalInvestment
           : totalInvestment // ignore: cast_nullable_to_non_nullable
+              as int,
+      currentCashValue: null == currentCashValue
+          ? _value.currentCashValue
+          : currentCashValue // ignore: cast_nullable_to_non_nullable
               as int,
       currentStockValue: null == currentStockValue
           ? _value.currentStockValue
@@ -233,6 +246,7 @@ class __$$RebalancingStateImplCopyWithImpl<$Res>
 class _$RebalancingStateImpl implements _RebalancingState {
   _$RebalancingStateImpl(
       {this.totalInvestment = 0,
+      this.currentCashValue = 0,
       this.currentStockValue = 0,
       this.currentBondValue = 0,
       this.currentIndexValue = 0,
@@ -247,6 +261,9 @@ class _$RebalancingStateImpl implements _RebalancingState {
   @override
   @JsonKey()
   final int totalInvestment;
+  @override
+  @JsonKey()
+  final int currentCashValue;
   @override
   @JsonKey()
   final int currentStockValue;
@@ -281,7 +298,7 @@ class _$RebalancingStateImpl implements _RebalancingState {
 
   @override
   String toString() {
-    return 'RebalancingState(totalInvestment: $totalInvestment, currentStockValue: $currentStockValue, currentBondValue: $currentBondValue, currentIndexValue: $currentIndexValue, cashRatio: $cashRatio, stockRatio: $stockRatio, bondRatio: $bondRatio, individualStockRatio: $individualStockRatio, indexStockRatio: $indexStockRatio, isStockDetailOn: $isStockDetailOn, isBondEvaluationEnabled: $isBondEvaluationEnabled)';
+    return 'RebalancingState(totalInvestment: $totalInvestment, currentCashValue: $currentCashValue, currentStockValue: $currentStockValue, currentBondValue: $currentBondValue, currentIndexValue: $currentIndexValue, cashRatio: $cashRatio, stockRatio: $stockRatio, bondRatio: $bondRatio, individualStockRatio: $individualStockRatio, indexStockRatio: $indexStockRatio, isStockDetailOn: $isStockDetailOn, isBondEvaluationEnabled: $isBondEvaluationEnabled)';
   }
 
   @override
@@ -291,6 +308,8 @@ class _$RebalancingStateImpl implements _RebalancingState {
             other is _$RebalancingStateImpl &&
             (identical(other.totalInvestment, totalInvestment) ||
                 other.totalInvestment == totalInvestment) &&
+            (identical(other.currentCashValue, currentCashValue) ||
+                other.currentCashValue == currentCashValue) &&
             (identical(other.currentStockValue, currentStockValue) ||
                 other.currentStockValue == currentStockValue) &&
             (identical(other.currentBondValue, currentBondValue) ||
@@ -318,6 +337,7 @@ class _$RebalancingStateImpl implements _RebalancingState {
   int get hashCode => Object.hash(
       runtimeType,
       totalInvestment,
+      currentCashValue,
       currentStockValue,
       currentBondValue,
       currentIndexValue,
@@ -342,6 +362,7 @@ class _$RebalancingStateImpl implements _RebalancingState {
 abstract class _RebalancingState implements RebalancingState {
   factory _RebalancingState(
       {final int totalInvestment,
+      final int currentCashValue,
       final int currentStockValue,
       final int currentBondValue,
       final int currentIndexValue,
@@ -355,6 +376,8 @@ abstract class _RebalancingState implements RebalancingState {
 
   @override
   int get totalInvestment;
+  @override
+  int get currentCashValue;
   @override
   int get currentStockValue;
   @override

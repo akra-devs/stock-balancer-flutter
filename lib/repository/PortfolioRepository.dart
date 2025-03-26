@@ -1,7 +1,38 @@
-import '../portfolio_tab.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
+
 import '../portfolio_tab.dart';
+
+PortfolioRepository getRepository() {
+  if (kIsWeb) {
+    return NoOpPortfolioRepository();
+  } else {
+    return SQLitePortfolioRepository();
+  }
+}
+
+class NoOpPortfolioRepository implements PortfolioRepository {
+  @override
+  Future<Map<String, PortfolioItem>> fetchPortfolioItems() async {
+    return {}; // 웹에서는 빈 데이터를 반환
+  }
+
+  @override
+  Future<void> addPortfolioItem(PortfolioItem item) async {
+    // 아무 작업도 수행하지 않음
+  }
+
+  @override
+  Future<void> removePortfolioItem(String id) async {
+    // 아무 작업도 수행하지 않음
+  }
+
+  @override
+  Future<void> updatePortfolioItem(PortfolioItem item) async {
+    // 아무 작업도 수행하지 않음
+  }
+}
 
 /// Repository 추상화: Portfolio 데이터를 저장/조회/수정/삭제하는 인터페이스
 abstract class PortfolioRepository {
@@ -49,7 +80,8 @@ class SQLitePortfolioRepository implements PortfolioRepository {
   @override
   Future<Map<String, PortfolioItem>> fetchPortfolioItems() async {
     final dbClient = await database;
-    final List<Map<String, dynamic>> results = await dbClient.query('portfolio');
+    final List<Map<String, dynamic>> results =
+        await dbClient.query('portfolio');
     final Map<String, PortfolioItem> items = {};
     for (var row in results) {
       final item = PortfolioItem(

@@ -142,12 +142,6 @@ class ToggleStockDetail extends RebalancingEvent {}
 class ToggleBondEvaluation extends RebalancingEvent {}
 
 // 추가: 세부 설정 관련 이벤트
-class TotalIndexPurchaseChanged extends RebalancingEvent {
-  final int totalIndexPurchase;
-
-  TotalIndexPurchaseChanged(this.totalIndexPurchase);
-}
-
 class CurrentIndexValueChanged extends RebalancingEvent {
   final int currentIndexValue;
 
@@ -240,9 +234,7 @@ class RebalancingBloc extends Bloc<RebalancingEvent, RebalancingState> {
         bondRatio: bondRatio,
       ));
     });
-    on<TotalIndexPurchaseChanged>((event, emit) {
-      emit(state.copyWith(totalIndexPurchase: event.totalIndexPurchase));
-    });
+
     on<CurrentIndexValueChanged>((event, emit) {
       emit(state.copyWith(currentIndexValue: event.currentIndexValue));
     });

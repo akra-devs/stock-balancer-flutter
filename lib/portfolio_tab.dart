@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
 import 'package:stock_rebalance/extensions.dart';
+import 'package:stock_rebalance/repository/PortfolioRepository.dart';
 import 'package:uuid/uuid.dart';
 
 part 'portfolio_tab.freezed.dart';
@@ -35,9 +36,14 @@ class PortfolioItem with _$PortfolioItem {
 
 @freezed
 class PortfolioEvent with _$PortfolioEvent {
+  const factory PortfolioEvent.load() = _LoadPortfolioItem; // DB 초기 로드 이벤트 추가
   const factory PortfolioEvent.add(PortfolioItem item) = _AddPortfolioItem;
-  const factory PortfolioEvent.remove(PortfolioItem item) = _RemovePortfolioItem;
-  const factory PortfolioEvent.change(PortfolioItem item) = _ChangePortfolioItem;
+
+  const factory PortfolioEvent.remove(PortfolioItem item) =
+      _RemovePortfolioItem;
+
+  const factory PortfolioEvent.change(PortfolioItem item) =
+      _ChangePortfolioItem;
 }
 
 @freezed
@@ -48,21 +54,32 @@ class PortfolioState with _$PortfolioState {
 }
 
 class PortfolioBloc extends Bloc<PortfolioEvent, PortfolioState> {
-  PortfolioBloc() : super(PortfolioState()) {
-    on<_AddPortfolioItem>((event, emit) {
+  final PortfolioRepository repository;
+
+  PortfolioBloc({required this.repository}) : super(PortfolioState()) {
+    // 앱 시작 시 DB에서 데이터를 로드하여 상태 초기화
+    on<_LoadPortfolioItem>((event, emit) async {
+      final items = await repository.fetchPortfolioItems();
+      emit(state.copyWith(items: items));
+    });
+    // 아이템 추가: Repository에 추가한 후, 최신 상태를 다시 불러옴
+    on<_AddPortfolioItem>((event, emit) async {
+      await repository.addPortfolioItem(event.item);
       final newMap = Map<String, PortfolioItem>.from(state.items);
       newMap[event.item.id] = event.item;
       emit(state.copyWith(items: newMap));
     });
-    on<_RemovePortfolioItem>((event, emit) {
+    // 아이템 삭제: Repository에 삭제한 후, 최신 상태를 다시 불러옴
+    on<_RemovePortfolioItem>((event, emit) async {
+      await repository.removePortfolioItem(event.item.id);
       final newMap = Map<String, PortfolioItem>.from(state.items);
       newMap.remove(event.item.id);
       emit(state.copyWith(items: newMap));
     });
-    on<_ChangePortfolioItem>((event, emit) {
-      final newMap = Map<String, PortfolioItem>.from(state.items);
-      newMap[event.item.id] = event.item;
-      emit(state.copyWith(items: newMap));
+    // 아이템 수정: Repository에 수정한 후, 최신 상태를 다시 불러옴
+    on<_ChangePortfolioItem>((event, emit) async {
+      await repository.updatePortfolioItem(event.item);
+      add(const PortfolioEvent.load());
     });
   }
 }
@@ -88,10 +105,12 @@ class PortfolioPage extends StatelessWidget {
             itemCount: itemsList.length,
             itemBuilder: (context, index) {
               final item = itemsList[index];
-              final dateStr = DateFormat('yyyy-MM-dd HH:mm').format(item.savedAt);
+              final dateStr =
+                  DateFormat('yyyy-MM-dd HH:mm').format(item.savedAt);
               final isPositive = item.rebalanceAmount > 0;
               final action = isPositive ? '매도' : '매수';
-              final amountStr = '${isPositive ? '+' : '-'}${item.rebalanceAmount.abs().toNumberFormat()}';
+              final amountStr =
+                  '${isPositive ? '+' : '-'}${item.rebalanceAmount.abs().toNumberFormat()}';
 
               return Dismissible(
                 key: Key(item.id),
@@ -108,7 +127,9 @@ class PortfolioPage extends StatelessWidget {
                   child: Icon(Icons.delete, color: Colors.white),
                 ),
                 onDismissed: (_) {
-                  context.read<PortfolioBloc>().add(PortfolioEvent.remove(item));
+                  context
+                      .read<PortfolioBloc>()
+                      .add(PortfolioEvent.remove(item));
                 },
                 child: Card(
                   margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -140,6 +161,7 @@ class PortfolioPage extends StatelessWidget {
 
 class PortfolioDetailPage extends StatelessWidget {
   final PortfolioItem item;
+
   const PortfolioDetailPage({Key? key, required this.item}) : super(key: key);
 
   @override
@@ -159,9 +181,11 @@ class PortfolioDetailPage extends StatelessWidget {
           children: [
             Text('저장 일시: $dateStr', style: TextStyle(fontSize: 16)),
             SizedBox(height: 10),
-            Text('총 매수원금: ${item.totalInvestment.toNumberFormat()} 원', style: TextStyle(fontSize: 16)),
+            Text('총 매수원금: ${item.totalInvestment.toNumberFormat()} 원',
+                style: TextStyle(fontSize: 16)),
             SizedBox(height: 10),
-            Text('현재 주식 평가 금액: ${item.currentStockValue.toNumberFormat()} 원', style: TextStyle(fontSize: 16)),
+            Text('현재 주식 평가 금액: ${item.currentStockValue.toNumberFormat()} 원',
+                style: TextStyle(fontSize: 16)),
             SizedBox(height: 10),
             Text(
               '리벨런싱 결과: 주식을 ${item.rebalanceAmount.abs().toNumberFormat()} 원 만큼 $action 하세요.',

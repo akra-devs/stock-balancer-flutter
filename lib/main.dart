@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'rebalancing_tab.dart';
+import 'package:stock_rebalance/repository/PortfolioRepository.dart';
+
 import 'portfolio_tab.dart';
+import 'rebalancing_tab.dart';
 
 void main() {
   runApp(RebalancingApp());
@@ -16,7 +18,8 @@ class RebalancingApp extends StatelessWidget {
           create: (_) => RebalancingBloc(),
         ),
         BlocProvider<PortfolioBloc>(
-          create: (_) => PortfolioBloc(),
+          create: (_) => PortfolioBloc(repository: getRepository())
+            ..add(const PortfolioEvent.load()),
         ),
       ],
       child: MaterialApp(
@@ -43,7 +46,7 @@ class _MainScreenState extends State<MainScreen> {
   // 각 탭은 별도의 파일에 구현된 위젯을 사용합니다.
   final List<Widget> _pages = [
     RebalancingHomePage(), // 계산 탭
-    PortfolioPage(),       // 포트폴리오 탭
+    PortfolioPage(), // 포트폴리오 탭
   ];
 
   void _onItemTapped(int index) {

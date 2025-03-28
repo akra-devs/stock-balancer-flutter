@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../portfolio_tab.dart';
+import '../rebalancing_tab.dart';
 
 PortfolioRepository getRepository() {
   if (kIsWeb) {
@@ -49,28 +52,29 @@ abstract class PortfolioRepository {
 class SQLitePortfolioRepository implements PortfolioRepository {
   Database? _db;
 
-  /// 데이터베이스 객체 getter (없으면 초기화)
   Future<Database> get database async {
     if (_db != null) return _db!;
     _db = await _initDb();
     return _db!;
   }
 
-  /// 데이터베이스 초기화 및 테이블 생성
   Future<Database> _initDb() async {
     final databasesPath = await getDatabasesPath();
     final path = join(databasesPath, 'portfolio.db');
     return await openDatabase(
       path,
-      version: 1,
+      version: 2, // 버전 올림
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE portfolio (
             id TEXT PRIMARY KEY,
             savedAt INTEGER,
-            rebalanceAmount REAL,
             totalInvestment REAL,
-            currentStockValue REAL
+            beforeCashValue REAL,
+            beforeStockValue REAL,
+            beforeBondValue REAL,
+            beforeIndexValue REAL,
+            result TEXT
           )
         ''');
       },
@@ -80,16 +84,20 @@ class SQLitePortfolioRepository implements PortfolioRepository {
   @override
   Future<Map<String, PortfolioItem>> fetchPortfolioItems() async {
     final dbClient = await database;
-    final List<Map<String, dynamic>> results =
-        await dbClient.query('portfolio');
+    final results = await dbClient.query('portfolio');
     final Map<String, PortfolioItem> items = {};
-    for (var row in results) {
+
+    for (final row in results) {
+      final resultJson = json.decode(row['result'] as String);
       final item = PortfolioItem(
         id: row['id'] as String,
         savedAt: DateTime.fromMillisecondsSinceEpoch(row['savedAt'] as int),
-        rebalanceAmount: row['rebalanceAmount'] as double,
         totalInvestment: row['totalInvestment'] as double,
-        currentStockValue: row['currentStockValue'] as double,
+        beforeCashValue: row['beforeCashValue'] as double,
+        beforeStockValue: row['beforeStockValue'] as double,
+        beforeBondValue: row['beforeBondValue'] as double?,
+        beforeIndexValue: row['beforeIndexValue'] as double?,
+        result: RebalanceResult.fromJson(resultJson),
       );
       items[item.id] = item;
     }
@@ -104,9 +112,12 @@ class SQLitePortfolioRepository implements PortfolioRepository {
       {
         'id': item.id,
         'savedAt': item.savedAt.millisecondsSinceEpoch,
-        'rebalanceAmount': item.rebalanceAmount,
         'totalInvestment': item.totalInvestment,
-        'currentStockValue': item.currentStockValue,
+        'beforeCashValue': item.beforeCashValue,
+        'beforeStockValue': item.beforeStockValue,
+        'beforeBondValue': item.beforeBondValue,
+        'beforeIndexValue': item.beforeIndexValue,
+        'result': json.encode(item.result.toJson()),
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -130,9 +141,12 @@ class SQLitePortfolioRepository implements PortfolioRepository {
       {
         'id': item.id,
         'savedAt': item.savedAt.millisecondsSinceEpoch,
-        'rebalanceAmount': item.rebalanceAmount,
         'totalInvestment': item.totalInvestment,
-        'currentStockValue': item.currentStockValue,
+        'beforeCashValue': item.beforeCashValue,
+        'beforeStockValue': item.beforeStockValue,
+        'beforeBondValue': item.beforeBondValue,
+        'beforeIndexValue': item.beforeIndexValue,
+        'result': json.encode(item.result.toJson()),
       },
       where: 'id = ?',
       whereArgs: [item.id],

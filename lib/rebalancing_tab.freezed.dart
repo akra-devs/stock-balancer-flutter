@@ -14,6 +14,252 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
+RebalanceResult _$RebalanceResultFromJson(Map<String, dynamic> json) {
+  return _RebalanceResult.fromJson(json);
+}
+
+/// @nodoc
+mixin _$RebalanceResult {
+  double get cashAdjustmentAmount => throw _privateConstructorUsedError;
+  double get stockAdjustmentAmount => throw _privateConstructorUsedError;
+  double? get bondAdjustmentAmount => throw _privateConstructorUsedError;
+  double? get individualAdjustment => throw _privateConstructorUsedError;
+  double? get indexAdjustment => throw _privateConstructorUsedError;
+
+  /// Serializes this RebalanceResult to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of RebalanceResult
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $RebalanceResultCopyWith<RebalanceResult> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $RebalanceResultCopyWith<$Res> {
+  factory $RebalanceResultCopyWith(
+          RebalanceResult value, $Res Function(RebalanceResult) then) =
+      _$RebalanceResultCopyWithImpl<$Res, RebalanceResult>;
+  @useResult
+  $Res call(
+      {double cashAdjustmentAmount,
+      double stockAdjustmentAmount,
+      double? bondAdjustmentAmount,
+      double? individualAdjustment,
+      double? indexAdjustment});
+}
+
+/// @nodoc
+class _$RebalanceResultCopyWithImpl<$Res, $Val extends RebalanceResult>
+    implements $RebalanceResultCopyWith<$Res> {
+  _$RebalanceResultCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of RebalanceResult
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? cashAdjustmentAmount = null,
+    Object? stockAdjustmentAmount = null,
+    Object? bondAdjustmentAmount = freezed,
+    Object? individualAdjustment = freezed,
+    Object? indexAdjustment = freezed,
+  }) {
+    return _then(_value.copyWith(
+      cashAdjustmentAmount: null == cashAdjustmentAmount
+          ? _value.cashAdjustmentAmount
+          : cashAdjustmentAmount // ignore: cast_nullable_to_non_nullable
+              as double,
+      stockAdjustmentAmount: null == stockAdjustmentAmount
+          ? _value.stockAdjustmentAmount
+          : stockAdjustmentAmount // ignore: cast_nullable_to_non_nullable
+              as double,
+      bondAdjustmentAmount: freezed == bondAdjustmentAmount
+          ? _value.bondAdjustmentAmount
+          : bondAdjustmentAmount // ignore: cast_nullable_to_non_nullable
+              as double?,
+      individualAdjustment: freezed == individualAdjustment
+          ? _value.individualAdjustment
+          : individualAdjustment // ignore: cast_nullable_to_non_nullable
+              as double?,
+      indexAdjustment: freezed == indexAdjustment
+          ? _value.indexAdjustment
+          : indexAdjustment // ignore: cast_nullable_to_non_nullable
+              as double?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$RebalanceResultImplCopyWith<$Res>
+    implements $RebalanceResultCopyWith<$Res> {
+  factory _$$RebalanceResultImplCopyWith(_$RebalanceResultImpl value,
+          $Res Function(_$RebalanceResultImpl) then) =
+      __$$RebalanceResultImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {double cashAdjustmentAmount,
+      double stockAdjustmentAmount,
+      double? bondAdjustmentAmount,
+      double? individualAdjustment,
+      double? indexAdjustment});
+}
+
+/// @nodoc
+class __$$RebalanceResultImplCopyWithImpl<$Res>
+    extends _$RebalanceResultCopyWithImpl<$Res, _$RebalanceResultImpl>
+    implements _$$RebalanceResultImplCopyWith<$Res> {
+  __$$RebalanceResultImplCopyWithImpl(
+      _$RebalanceResultImpl _value, $Res Function(_$RebalanceResultImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of RebalanceResult
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? cashAdjustmentAmount = null,
+    Object? stockAdjustmentAmount = null,
+    Object? bondAdjustmentAmount = freezed,
+    Object? individualAdjustment = freezed,
+    Object? indexAdjustment = freezed,
+  }) {
+    return _then(_$RebalanceResultImpl(
+      cashAdjustmentAmount: null == cashAdjustmentAmount
+          ? _value.cashAdjustmentAmount
+          : cashAdjustmentAmount // ignore: cast_nullable_to_non_nullable
+              as double,
+      stockAdjustmentAmount: null == stockAdjustmentAmount
+          ? _value.stockAdjustmentAmount
+          : stockAdjustmentAmount // ignore: cast_nullable_to_non_nullable
+              as double,
+      bondAdjustmentAmount: freezed == bondAdjustmentAmount
+          ? _value.bondAdjustmentAmount
+          : bondAdjustmentAmount // ignore: cast_nullable_to_non_nullable
+              as double?,
+      individualAdjustment: freezed == individualAdjustment
+          ? _value.individualAdjustment
+          : individualAdjustment // ignore: cast_nullable_to_non_nullable
+              as double?,
+      indexAdjustment: freezed == indexAdjustment
+          ? _value.indexAdjustment
+          : indexAdjustment // ignore: cast_nullable_to_non_nullable
+              as double?,
+    ));
+  }
+}
+
+/// @nodoc
+
+@JsonSerializable()
+class _$RebalanceResultImpl implements _RebalanceResult {
+  _$RebalanceResultImpl(
+      {required this.cashAdjustmentAmount,
+      required this.stockAdjustmentAmount,
+      this.bondAdjustmentAmount,
+      this.individualAdjustment,
+      this.indexAdjustment});
+
+  factory _$RebalanceResultImpl.fromJson(Map<String, dynamic> json) =>
+      _$$RebalanceResultImplFromJson(json);
+
+  @override
+  final double cashAdjustmentAmount;
+  @override
+  final double stockAdjustmentAmount;
+  @override
+  final double? bondAdjustmentAmount;
+  @override
+  final double? individualAdjustment;
+  @override
+  final double? indexAdjustment;
+
+  @override
+  String toString() {
+    return 'RebalanceResult(cashAdjustmentAmount: $cashAdjustmentAmount, stockAdjustmentAmount: $stockAdjustmentAmount, bondAdjustmentAmount: $bondAdjustmentAmount, individualAdjustment: $individualAdjustment, indexAdjustment: $indexAdjustment)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$RebalanceResultImpl &&
+            (identical(other.cashAdjustmentAmount, cashAdjustmentAmount) ||
+                other.cashAdjustmentAmount == cashAdjustmentAmount) &&
+            (identical(other.stockAdjustmentAmount, stockAdjustmentAmount) ||
+                other.stockAdjustmentAmount == stockAdjustmentAmount) &&
+            (identical(other.bondAdjustmentAmount, bondAdjustmentAmount) ||
+                other.bondAdjustmentAmount == bondAdjustmentAmount) &&
+            (identical(other.individualAdjustment, individualAdjustment) ||
+                other.individualAdjustment == individualAdjustment) &&
+            (identical(other.indexAdjustment, indexAdjustment) ||
+                other.indexAdjustment == indexAdjustment));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      cashAdjustmentAmount,
+      stockAdjustmentAmount,
+      bondAdjustmentAmount,
+      individualAdjustment,
+      indexAdjustment);
+
+  /// Create a copy of RebalanceResult
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$RebalanceResultImplCopyWith<_$RebalanceResultImpl> get copyWith =>
+      __$$RebalanceResultImplCopyWithImpl<_$RebalanceResultImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$RebalanceResultImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _RebalanceResult implements RebalanceResult {
+  factory _RebalanceResult(
+      {required final double cashAdjustmentAmount,
+      required final double stockAdjustmentAmount,
+      final double? bondAdjustmentAmount,
+      final double? individualAdjustment,
+      final double? indexAdjustment}) = _$RebalanceResultImpl;
+
+  factory _RebalanceResult.fromJson(Map<String, dynamic> json) =
+      _$RebalanceResultImpl.fromJson;
+
+  @override
+  double get cashAdjustmentAmount;
+  @override
+  double get stockAdjustmentAmount;
+  @override
+  double? get bondAdjustmentAmount;
+  @override
+  double? get individualAdjustment;
+  @override
+  double? get indexAdjustment;
+
+  /// Create a copy of RebalanceResult
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$RebalanceResultImplCopyWith<_$RebalanceResultImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 /// @nodoc
 mixin _$RebalancingState {
   int get totalInvestment => throw _privateConstructorUsedError;

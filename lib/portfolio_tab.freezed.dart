@@ -47,6 +47,8 @@ abstract class $PortfolioItemCopyWith<$Res> {
       double? beforeBondValue,
       double? beforeIndexValue,
       RebalanceResult result});
+
+  $RebalanceResultCopyWith<$Res> get result;
 }
 
 /// @nodoc
@@ -108,6 +110,16 @@ class _$PortfolioItemCopyWithImpl<$Res, $Val extends PortfolioItem>
               as RebalanceResult,
     ) as $Val);
   }
+
+  /// Create a copy of PortfolioItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $RebalanceResultCopyWith<$Res> get result {
+    return $RebalanceResultCopyWith<$Res>(_value.result, (value) {
+      return _then(_value.copyWith(result: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -127,6 +139,9 @@ abstract class _$$PortfolioItemImplCopyWith<$Res>
       double? beforeBondValue,
       double? beforeIndexValue,
       RebalanceResult result});
+
+  @override
+  $RebalanceResultCopyWith<$Res> get result;
 }
 
 /// @nodoc

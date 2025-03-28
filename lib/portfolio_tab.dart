@@ -44,6 +44,21 @@ class PortfolioItem with _$PortfolioItem {
   }
 }
 
+extension PortfolioItemExtension on PortfolioItem {
+  double getTotalInvestmentDelta() {
+    final before = totalInvestment;
+    final after = beforeStockValue +(beforeBondValue ?? 0);
+    print('before: $before, after: $after');
+    return after - before;
+  }
+  /*
+  * 100
+  * 100
+  * 50
+  *
+  * */
+}
+
 @freezed
 class PortfolioEvent with _$PortfolioEvent {
   const factory PortfolioEvent.load() = _LoadPortfolioItem; // DB 초기 로드 이벤트 추가
@@ -117,10 +132,8 @@ class PortfolioPage extends StatelessWidget {
               final item = itemsList[index];
               final dateStr =
                   DateFormat('yyyy-MM-dd HH:mm').format(item.savedAt);
-              final isPositive = item.rebalanceAmount > 0;
-              final action = isPositive ? '매도' : '매수';
-              final amountStr =
-                  '${isPositive ? '+' : '-'}${item.rebalanceAmount.abs().toNumberFormat()}';
+              final isPositive = item.result.stockAdjustmentAmount > 0;
+              final amountStr = item.getTotalInvestmentDelta();
 
               return Dismissible(
                 key: Key(item.id),
@@ -149,7 +162,7 @@ class PortfolioPage extends StatelessWidget {
                       color: isPositive ? Colors.green : Colors.red,
                     ),
                     title: Text(dateStr),
-                    subtitle: Text('총 자산 변화: $amountStr ($action)'),
+                    subtitle: Text('총 자산 변화: $amountStr'),
                     onTap: () {
                       Navigator.push(
                         context,
@@ -177,7 +190,7 @@ class PortfolioDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dateStr = DateFormat('yyyy-MM-dd HH:mm').format(item.savedAt);
-    final isPositive = item.rebalanceAmount > 0;
+    final isPositive = item.result.stockAdjustmentAmount > 0;
     final action = isPositive ? '매도' : '매수';
 
     return Scaffold(
@@ -194,12 +207,37 @@ class PortfolioDetailPage extends StatelessWidget {
             Text('총 매수원금: ${item.totalInvestment.toNumberFormat()} 원',
                 style: TextStyle(fontSize: 16)),
             SizedBox(height: 10),
-            Text('현재 주식 평가 금액: ${item.currentStockValue.toNumberFormat()} 원',
+            Text('현재 주식 평가 금액: ${item.beforeStockValue.toNumberFormat()} 원',
                 style: TextStyle(fontSize: 16)),
             SizedBox(height: 10),
-            Text(
-              '리벨런싱 결과: 주식을 ${item.rebalanceAmount.abs().toNumberFormat()} 원 만큼 $action 하세요.',
-              style: TextStyle(fontSize: 16),
+            const Text('리벨런싱 결과:'),
+            SizedBox(height: 2),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '주식을 ${item.result.stockAdjustmentAmount.abs().toNumberFormat()} 원 만큼 $action 하세요.',
+                  style: TextStyle(fontSize: 16),
+                ),
+                if (item.result.individualAdjustment != null)
+                  Text(
+                    '개별 주식을 ${item.result.individualAdjustment!.abs().toNumberFormat()} 원 만큼 '
+                    '${item.result.individualAdjustment! > 0 ? '매수' : '매도'} 하세요.',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                if (item.result.indexAdjustment != null)
+                  Text(
+                    '지수 주식을 ${item.result.indexAdjustment!.abs().toNumberFormat()} 원 만큼 '
+                    '${item.result.indexAdjustment! > 0 ? '매수' : '매도'} 하세요.',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                if (item.result.bondAdjustmentAmount != null)
+                  Text(
+                    '채권을 ${item.result.bondAdjustmentAmount!.abs().toNumberFormat()} 원 만큼 '
+                    '${item.result.bondAdjustmentAmount! > 0 ? '매수' : '매도'} 하세요.',
+                    style: TextStyle(fontSize: 16),
+                  ),
+              ],
             ),
           ],
         ),

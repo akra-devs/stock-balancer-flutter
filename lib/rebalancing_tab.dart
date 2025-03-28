@@ -7,25 +7,25 @@ import 'package:stock_rebalance/portfolio_tab.dart';
 import 'package:stock_rebalance/service/RebalancingService.dart'; // 예: int.toNumberFormat() 확장 함수
 
 part 'rebalancing_tab.freezed.dart';
+part 'rebalancing_tab.g.dart';
 
 ///────────────────────────────
 /// 도메인 로직: 리벨런싱 계산 결과 모델 및 함수
 ///────────────────────────────
 
-class RebalanceResult {
-  final double cashAdjustmentAmount;
-  final double stockAdjustmentAmount;
-  final double? bondAdjustmentAmount;
-  final double? individualAdjustment;
-  final double? indexAdjustment;
+@freezed
+class RebalanceResult with _$RebalanceResult {
+  @JsonSerializable()
+  factory RebalanceResult({
+    required double cashAdjustmentAmount,
+    required double stockAdjustmentAmount,
+    double? bondAdjustmentAmount,
+    double? individualAdjustment,
+    double? indexAdjustment,
+  }) = _RebalanceResult;
 
-  RebalanceResult({
-    required this.cashAdjustmentAmount,
-    required this.stockAdjustmentAmount,
-    required this.bondAdjustmentAmount,
-    required this.individualAdjustment,
-    required this.indexAdjustment,
-  });
+  factory RebalanceResult.fromJson(Map<String, dynamic> json) =>
+      _$RebalanceResultFromJson(json);
 }
 
 ///────────────────────────────

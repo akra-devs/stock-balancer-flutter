@@ -31,18 +31,22 @@ RebalanceResult calculateRebalance(RebalancingState state) {
       "afterStockAmount: $afterStockAmount , rebalanceStockAmount: $rebalanceStockAmount");
 
   //====== 세부 설정 시 계산
-  final double beforeIndividualAdjustment = currentStockValue - currentIndexValue;
-  final double beforeIndexAdjustment = currentIndexValue;
-  final double afterIndividualAdjustment = afterStockAmount * individualStockRatio;
-  final double afterIndexAdjustment = afterStockAmount * indexStockRatio;
+  double? individualAdjustment;
+  double? indexAdjustment;
+  if (state.isStockDetailOn) {
+    final double beforeIndividualAdjustment =
+        currentStockValue - currentIndexValue;
+    final double beforeIndexAdjustment = currentIndexValue;
+    final double afterIndividualAdjustment =
+        afterStockAmount * individualStockRatio;
+    final double afterIndexAdjustment = afterStockAmount * indexStockRatio;
 
-  final double individualAdjustment =
-      afterIndividualAdjustment - beforeIndividualAdjustment;
-  final double indexAdjustment = afterIndexAdjustment - beforeIndexAdjustment;
-
-  print(
-      "individualAdjustment: $individualAdjustment ,  indexAdjustment: $indexAdjustment ");
-
+    individualAdjustment =
+        afterIndividualAdjustment - beforeIndividualAdjustment;
+    indexAdjustment = afterIndexAdjustment - beforeIndexAdjustment;
+    print(
+        "individualAdjustment: $individualAdjustment ,  indexAdjustment: $indexAdjustment ");
+  }
   // 계산 채권 변수
   double afterBondAmount = currentTotalValue * bondRatio;
   double rebalanceBondAmount = afterBondAmount - currentBondValue;

@@ -205,16 +205,16 @@ class RebalancingHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('리벨런싱 계산'),
+        title: const Text('리벨런싱 계산'),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             InvestmentInfoCard(),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             RebalancingRatioCard(),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             BlocBuilder<RebalancingBloc, RebalancingState>(
               builder: (context, state) {
                 int totalRatio = state.cashRatio +
@@ -223,25 +223,25 @@ class RebalancingHomePage extends StatelessWidget {
                 return Text('총 비중: $totalRatio% (100% 필요)');
               },
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 final state = context.read<RebalancingBloc>().state;
                 if (state.totalInvestment == 0) {
                   ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text('총 매수 원금이 0입니다.')));
+                      .showSnackBar(const SnackBar(content: Text('총 매수 원금이 0입니다.')));
                   return;
                 }
                 if (state.cashRatio >= 100) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('현금비중이 100% 이상일 수 없습니다.')));
+                      const SnackBar(content: Text('현금비중이 100% 이상일 수 없습니다.')));
                   return;
                 }
                 var totalRatio =
                     state.stockRatio + state.cashRatio + state.bondRatio;
                 if (totalRatio != 100) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('총 비중이 100% 이어야 합니다.')));
+                      const SnackBar(content: Text('총 비중이 100% 이어야 합니다.')));
                   return;
                 }
                 RebalanceResult result = calculateRebalance(state);
@@ -278,20 +278,20 @@ class RebalancingHomePage extends StatelessWidget {
                 showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
-                    title: Text('리벨런싱 결과'),
+                    title: const Text('리벨런싱 결과'),
                     content: Text(overallText + detailText + bondResult),
                     actions: [
                       TextButton(
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: Text('확인'),
+                        child: const Text('확인'),
                       ),
                     ],
                   ),
                 );
               },
-              child: Text('리벨런싱 계산'),
+              child: const Text('리벨런싱 계산'),
             ),
           ],
         ),
@@ -372,9 +372,9 @@ class _InvestmentInfoCardState extends State<InvestmentInfoCard> {
     final bloc = context.read<RebalancingBloc>();
     return Card(
       elevation: 4,
-      margin: EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: 8),
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -387,10 +387,11 @@ class _InvestmentInfoCardState extends State<InvestmentInfoCard> {
             TextField(
               controller: totalInvestmentController,
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: '총 매수 원금 금액',
                 suffixIcon: Tooltip(
                   message: '총 매수 원금 = 주식+채권 전체 매수 당시 금액',
+                  triggerMode: TooltipTriggerMode.tap,
                   child: Icon(Icons.help_outline, size: 16),
                 ),
               ),
@@ -405,10 +406,11 @@ class _InvestmentInfoCardState extends State<InvestmentInfoCard> {
             TextField(
               controller: currentCashValueController,
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: '보유 현금액',
                 suffixIcon: Tooltip(
                   message: '투자에 가능한 여유 현금 보유량',
+                  triggerMode: TooltipTriggerMode.tap,
                   child: Icon(Icons.help_outline, size: 16),
                 ),
               ),
@@ -425,10 +427,11 @@ class _InvestmentInfoCardState extends State<InvestmentInfoCard> {
                   child: TextField(
                     controller: currentStockValueController,
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: '현재 주식 평가 금액',
                       suffixIcon: Tooltip(
                         message: '개별 주식 + 지수 주식 총 합계',
+                        triggerMode: TooltipTriggerMode.tap,
                         child: Icon(Icons.help_outline, size: 16),
                       ),
                     ),

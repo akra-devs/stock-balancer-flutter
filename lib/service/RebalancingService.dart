@@ -21,14 +21,14 @@ RebalanceResult calculateRebalance(RebalancingState state) {
   double afterCashAmount = currentTotalValue * cashRatio;
   double rebalanceCashAmount = afterCashAmount - currentCashValue;
 
-  print(
-      "afterCashAmount: $afterCashAmount , rebalanceCashAmount: $rebalanceCashAmount");
+  // print(
+  //     "afterCashAmount: $afterCashAmount , rebalanceCashAmount: $rebalanceCashAmount");
 
   // 게산 주식 변수
   double afterStockAmount = currentTotalValue * stockRatio;
   double rebalanceStockAmount = afterStockAmount - currentStockValue;
-  print(
-      "afterStockAmount: $afterStockAmount , rebalanceStockAmount: $rebalanceStockAmount");
+  // print(
+  //     "afterStockAmount: $afterStockAmount , rebalanceStockAmount: $rebalanceStockAmount");
 
   //====== 세부 설정 시 계산
   double? individualAdjustment;
@@ -44,14 +44,14 @@ RebalanceResult calculateRebalance(RebalancingState state) {
     individualAdjustment =
         afterIndividualAdjustment - beforeIndividualAdjustment;
     indexAdjustment = afterIndexAdjustment - beforeIndexAdjustment;
-    print(
-        "individualAdjustment: $individualAdjustment ,  indexAdjustment: $indexAdjustment ");
+    // print(
+    //     "individualAdjustment: $individualAdjustment ,  indexAdjustment: $indexAdjustment ");
   }
   // 계산 채권 변수
   double afterBondAmount = currentTotalValue * bondRatio;
   double rebalanceBondAmount = afterBondAmount - currentBondValue;
-  print(
-      "afterBondAmount: $afterBondAmount , rebalanceBondAmount: $rebalanceBondAmount");
+  // print(
+  //     "afterBondAmount: $afterBondAmount , rebalanceBondAmount: $rebalanceBondAmount");
 
   return RebalanceResult(
     cashAdjustmentAmount: rebalanceCashAmount,

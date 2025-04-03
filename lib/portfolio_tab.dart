@@ -48,15 +48,9 @@ extension PortfolioItemExtension on PortfolioItem {
   double getTotalInvestmentDelta() {
     final before = totalInvestment;
     final after = beforeStockValue +(beforeBondValue ?? 0);
-    print('before: $before, after: $after');
+    // print('before: $before, after: $after');
     return after - before;
   }
-  /*
-  * 100
-  * 100
-  * 50
-  *
-  * */
 }
 
 @freezed
